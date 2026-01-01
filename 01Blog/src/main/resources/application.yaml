@@ -1,3 +1,18 @@
 spring:
   application:
     name: 01Blog
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/blogdb
+    username: bloguser
+    password: blogpass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update # change à "validate" ou "create-drop" selon besoin
+    show-sql: true     # affiche les requêtes SQL dans la console
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
