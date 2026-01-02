@@ -18,6 +18,8 @@ public class UserController {
 
     @PostMapping
     public User saveUser(@RequestBody User user) {
-        return userRepository.save(user);
+        
+         userRepository.save(user);
+         return user;
     }
 }

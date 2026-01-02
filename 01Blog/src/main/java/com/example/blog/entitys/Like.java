@@ -1,4 +1,5 @@
 package com.example.blog.entitys;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -9,18 +10,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor @AllArgsConstructor @Data
+@Table(name = "reactions")
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data 
-@Table(name = "users")
-
-public class User {
-    @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
+public class Like {
+@Id
+@GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String username;
-    private String email;
-    private String password;
-    private String role;
+    private Long post_id;
+    private String type;
+    
+
 }
