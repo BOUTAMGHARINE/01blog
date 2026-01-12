@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor @AllArgsConstructor @Data
 @Table(name = "reactions")
 
-public class Like {
+public class Reaction {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
