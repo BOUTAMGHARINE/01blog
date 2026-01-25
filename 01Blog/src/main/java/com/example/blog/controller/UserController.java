@@ -1,7 +1,7 @@
 package com.example.blog.controller;
 
+import com.example.blog.entities.*;
 import com.example.blog.repository.UserRepository;
-import com.example.blog.entitys.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

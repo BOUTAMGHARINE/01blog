@@ -4,7 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.*;
 
-import com.example.blog.entitys.Notification;
+import com.example.blog.entities.Notification;
 import com.example.blog.repository.NotificationRepository;
 
 @RestController

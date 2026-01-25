@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.blog.entities.Reaction;
 import com.example.blog.repository.ReactionRepository;
-import  com.example.blog.entitys.Reaction;
 @RestController
 @RequestMapping("/api/reactions")
 

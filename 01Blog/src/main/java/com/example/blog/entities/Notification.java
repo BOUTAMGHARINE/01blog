@@ -1,4 +1,4 @@
-package com.example.blog.entitys;
+package com.example.blog.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,15 +10,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@NoArgsConstructor @AllArgsConstructor @Data
-@Table(name = "reactions")
-
-public class Reaction {
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Table(name = "notifications")
+public class Notification {
 @Id
 @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long post_id;
+    private Long sender_id;
+    private Long receiver_id;
     private String type;
-    
-
 }

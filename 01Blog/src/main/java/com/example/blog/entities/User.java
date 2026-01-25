@@ -1,4 +1,4 @@
-package com.example.blog.entitys;
+package com.example.blog.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -8,7 +8,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.CascadeType;
 
 
@@ -16,6 +22,8 @@ import jakarta.persistence.CascadeType;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data 
+@ToString(exclude = "posts")
+
 @Table(name = "users")
 public class User {
     @Id
@@ -23,9 +31,12 @@ public class User {
     private Long id;
     private String username;
     private String email;
+    @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
     private String password;
     private String role;
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    
+    @JsonIgnore
     private List<Post> posts;
 
 } 
