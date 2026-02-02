@@ -50,13 +50,13 @@ public class WebSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/", "/api/signin").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/","/api/signin","/api/signup").permitAll()
                         .anyRequest().authenticated());
 
-        // http.addFilterBefore(
-        // authenticationJwtTokenFilter(),
-        // UsernamePasswordAuthenticationFilter.class
-        // );
+        http.addFilterBefore(
+        authenticationJwtTokenFilter(),
+        UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }

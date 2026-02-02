@@ -1,9 +1,9 @@
 spring:
   application:
-    name: 01Blog
+    name:   
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/blogdb
+    url: jdbc:postgresql://localhost:5432/blog
     username: bloguser
     password: blogpass
     driver-class-name: org.postgresql.Driver

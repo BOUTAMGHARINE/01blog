@@ -39,7 +39,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         System.out.println("JWT ==========================-------------------=== " );
 
             String jwt = parseJwt(request);
+                                    System.out.println("JWT ============rrrrrrrrrrrrr==============-------------------=== " );
+
             if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
+                                        System.out.println("JWT ============hhhhhhhhhhhhhhhhh==============-------------------=== " );
+
                 final String username = jwtUtil.getUserFromToken(jwt);
                 final UserDetails userDetails =
                         userDetailsService.loadUserByUsername(username);
@@ -54,21 +58,29 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         .setAuthentication(authenticationToken);
             }
         } catch (Exception e) {
+                                    System.out.println("JWTUUUUUUUUUUUUUUUUUu ==========================-------------------=== " );
+
             log.error("Cannot set user authentication: {}", e);
         }
         filterChain.doFilter(request, response); // needed for the next filter in the chain
     }
 
     private String parseJwt(HttpServletRequest request) {
+                                System.out.println("JWT =========================uuuuuuuuuuuuuuuuuuu=-------------------=== " );
+
         String headerAuth = request.getHeader("Authorization");
         if (headerAuth != null && headerAuth.startsWith(BEARER_)) {
             return headerAuth.substring(BEARER_.length());
         }
+                                        System.out.println("JWT =================11111111111111111111=-------------------=== " );
+
         return null;
     }
-    @Override
-   protected boolean shouldNotFilter(HttpServletRequest request) {
-    return request.getServletPath().equals("/api/signin");
- }
+@Override
+protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getServletPath();
+    return path.equals("/api/signin") || path.equals("/api/signup");
+}
+
 
 }

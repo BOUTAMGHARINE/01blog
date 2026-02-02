@@ -16,7 +16,7 @@ public class UserController {
     //     this.userRepository = userRepository;
     // }
 
-    @PostMapping
+    @PostMapping("/signin")
     public User saveUser(@RequestBody User user) {
         
          userRepository.save(user);
