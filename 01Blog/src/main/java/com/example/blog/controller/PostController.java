@@ -21,14 +21,14 @@ import java.util.List;
 
 
 @RestController
-//@RequestMapping("/api/posts")
+@RequestMapping("/api/posts")
 public class PostController {
     @Autowired
     private PostRepository postRepository;
     @Autowired
     private UserRepository userRepository;
 
-   @PostMapping("/api/addpost")
+   @PostMapping("addpost")
 public Post savePost(@RequestBody PostRequestDTO dto){
     User author = userRepository.findById(dto.getAuthorId())
                                 .orElseThrow(() -> new RuntimeException("User not found"));
@@ -41,7 +41,7 @@ public Post savePost(@RequestBody PostRequestDTO dto){
     post.setAuthor(author);  // <-- L'objet complet
     return postRepository.save(post);
 }
-@GetMapping("/api/getposts")
+@GetMapping("getposts")
 public List<Post> getPosts(){
     List<Post> post = postRepository.findByHidden(false);
     //System.out.println("--------"+post.toString());
@@ -49,7 +49,7 @@ public List<Post> getPosts(){
     return post;
 
 }
-@DeleteMapping("/api/deletepost/{postId}")
+@DeleteMapping("/deletepost/{postId}")
 public ResponseEntity<String> deletePost(
         @PathVariable Long postId,
         @RequestParam Long authorId) { 
@@ -67,7 +67,7 @@ public ResponseEntity<String> deletePost(
     postRepository.delete(post);
     return ResponseEntity.ok("Post deleted successfully");
 }
-@PutMapping("/api/editpost/{id}")
+@PutMapping("editpost/{id}")
 public ResponseEntity<String> updatePost(
         @PathVariable Long id,
         @RequestBody PostRequestDTO dto) {

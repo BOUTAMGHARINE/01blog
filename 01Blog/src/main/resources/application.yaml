@@ -18,7 +18,7 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
 jwt:
   secret: mySuperSecretKeyForJwtGeneration123456789
-  expiration: 36000   # 24 heures en millisecondes
+  expiration: 3600000   # 24 heures en millisecondes
   issuer: post-api
   header: Authorization
   prefix: Bearer
