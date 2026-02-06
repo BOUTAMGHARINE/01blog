@@ -56,9 +56,15 @@ public class AuthenticationController {
     //     return jwtUtils.generateToken(userDetails.getUsername());
     // }
     @PostMapping("/signin")
-    public String authenticateUser() {
-    System.out.println("CONTROLLER CALLED ✅");
-    return "OK";
+    public String authenticateUser(@RequestBody User  user) {
+    Authentication authentication = authenticationManager.authenticate(
+        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+            user.getUsername(),
+            user.getPassword())
+    );
+    UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+    return jwtUtils.generateToken(userDetails.getUsername());
+    
 }
 
 
