@@ -6,12 +6,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.example.blog.service.*;
 
 import com.example.blog.dto.PostRequestDTO;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
 import com.example.blog.repository.PostRepository;
 import com.example.blog.repository.UserRepository;
+import com.example.blog.service.PostService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +31,10 @@ public class PostController {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PostService postService;
 
-    @PostMapping(
+        @PostMapping(
         value = "/addpost",
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
@@ -38,39 +42,10 @@ public class PostController {
             @ModelAttribute PostRequestDTO dto,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
-
-        User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Post post = new Post();
-        post.setContent(dto.getContent());
-        post.setHidden(dto.isHidden());
-        post.setAuthor(author);
-        post.setCreatedAt(LocalDateTime.now());
-
-        if (file != null && !file.isEmpty()) {
-
-            String uploadDir = "uploads";
-            Files.createDirectories(Paths.get(uploadDir));
-
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(uploadDir, fileName);
-
-            Files.write(filePath, file.getBytes());
-
-            post.setMediaUrl(filePath.toString());
-
-            if (file.getContentType() != null) {
-                if (file.getContentType().startsWith("image")) {
-                    post.setMediaType("IMAGE");
-                } else if (file.getContentType().startsWith("video")) {
-                    post.setMediaType("VIDEO");
-                }
-            }
-        }
-
-        return ResponseEntity.ok(postRepository.save(post));
+        Post post = postService.createPost(dto, file);
+        return ResponseEntity.ok(post);
     }
+
 @GetMapping("getposts")
 public List<Post> getPosts() {
     List<Post> posts = postRepository.findByHidden(false);

@@ -76,6 +76,14 @@
             <optional>true</optional>
         </dependency>
 
+        <!--TTTTTTTTTttika-->
+        <dependency>
+    <groupId>org.apache.tika</groupId>
+    <artifactId>tika-core</artifactId>
+    <version>2.9.0</version>
+   </dependency>
+
+
         <!-- DevTools pour rechargement automatique -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -83,6 +91,7 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
+        
 
         <!-- Tests -->
         <dependency>
