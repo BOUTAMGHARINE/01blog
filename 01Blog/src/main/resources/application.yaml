@@ -22,3 +22,8 @@ jwt:
   issuer: post-api
   header: Authorization
   prefix: Bearer
+
+  spring:
+  web:
+    resources:
+      static-locations: file:uploads/

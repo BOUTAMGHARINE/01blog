@@ -30,8 +30,9 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String content;
-    private String image;
     private LocalDateTime createdAt;
+    private String mediaUrl; // image ou vidéo
+    private String mediaType; // IMAGE ou VIDEO
     @JsonIgnore
     private boolean hidden;
     @ManyToOne(fetch = FetchType.EAGER)

@@ -2,90 +2,124 @@ package com.example.blog.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.example.blog.dto.*;
-import com.example.blog.entities.*;
-import com.example.blog.repository.*;
+import com.example.blog.dto.PostRequestDTO;
+import com.example.blog.entities.Post;
+import com.example.blog.entities.User;
+import com.example.blog.repository.PostRepository;
+import com.example.blog.repository.UserRepository;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
-
-
-
-
-
-
-
 
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
+
     @Autowired
     private PostRepository postRepository;
+
     @Autowired
     private UserRepository userRepository;
 
-   @PostMapping("addpost")
-public Post savePost(@RequestBody PostRequestDTO dto){
-    User author = userRepository.findById(dto.getAuthorId())
-                                .orElseThrow(() -> new RuntimeException("User not found"));
-    System.out.println("----------------------------------------."+author);
-    Post post = new Post();
-    post.setCreatedAt(LocalDateTime.now());
-    post.setHidden(dto.isHidden());
-    post.setContent(dto.getContent());
-    post.setImage(dto.getImage());
-    post.setAuthor(author);  // <-- L'objet complet
-    return postRepository.save(post);
-}
+    @PostMapping(
+        value = "/addpost",
+        consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ResponseEntity<Post> savePost(
+            @ModelAttribute PostRequestDTO dto,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) throws IOException {
+
+        User author = userRepository.findById(dto.getAuthorId())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Post post = new Post();
+        post.setContent(dto.getContent());
+        post.setHidden(dto.isHidden());
+        post.setAuthor(author);
+        post.setCreatedAt(LocalDateTime.now());
+
+        if (file != null && !file.isEmpty()) {
+
+            String uploadDir = "uploads";
+            Files.createDirectories(Paths.get(uploadDir));
+
+            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path filePath = Paths.get(uploadDir, fileName);
+
+            Files.write(filePath, file.getBytes());
+
+            post.setMediaUrl(filePath.toString());
+
+            if (file.getContentType() != null) {
+                if (file.getContentType().startsWith("image")) {
+                    post.setMediaType("IMAGE");
+                } else if (file.getContentType().startsWith("video")) {
+                    post.setMediaType("VIDEO");
+                }
+            }
+        }
+
+        return ResponseEntity.ok(postRepository.save(post));
+    }
 @GetMapping("getposts")
-public List<Post> getPosts(){
-    List<Post> post = postRepository.findByHidden(false);
-    //System.out.println("--------"+post.toString());
+public List<Post> getPosts() {
+    List<Post> posts = postRepository.findByHidden(false);
 
-    return post;
+    posts.forEach(post -> {
+        if (post.getMediaUrl() != null) {
+            post.setMediaUrl("http://localhost:8080/" + Paths.get(post.getMediaUrl()).getFileName());
+        }
+    });
 
+    return posts;
 }
-@DeleteMapping("/deletepost/{postId}")
-public ResponseEntity<String> deletePost(
-        @PathVariable Long postId,
-        @RequestParam Long authorId) { 
 
-    // Vérifie si le post existe
-    Post post = postRepository.findById(postId)
-            .orElseThrow(() -> new RuntimeException("Post not found"));
 
-    if (!post.getAuthor().getId().equals(authorId)) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body("You are not allowed to delete this post");
+    @DeleteMapping("/deletepost/{postId}")
+    public ResponseEntity<String> deletePost(
+            @PathVariable Long postId,
+            @RequestParam Long authorId) {
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+
+        if (!post.getAuthor().getId().equals(authorId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not allowed to delete this post");
+        }
+
+        postRepository.delete(post);
+        return ResponseEntity.ok("Post deleted successfully");
     }
 
-    // Supprime le post
-    postRepository.delete(post);
-    return ResponseEntity.ok("Post deleted successfully");
-}
-@PutMapping("editpost/{id}")
-public ResponseEntity<String> updatePost(
-        @PathVariable Long id,
-        @RequestBody PostRequestDTO dto) {
+    @PutMapping("editpost/{id}")
+    public ResponseEntity<String> updatePost(
+            @PathVariable Long id,
+            @RequestBody PostRequestDTO dto) {
 
-    Post post = postRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Post not found"));
-    if (!post.getAuthor().equals(dto.getAuthorId())){
-         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body("You are not allowed to edite this post");
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
 
+        if (!post.getAuthor().getId().equals(dto.getAuthorId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("You are not allowed to edit this post");
+        }
+
+        post.setContent(dto.getContent());
+        post.setHidden(dto.isHidden());
+
+        postRepository.save(post);
+
+        return ResponseEntity.ok("Post updated successfully");
     }
-
-    post.setContent(dto.getContent());
-    post.setImage(dto.getImage());
-    post.setHidden(dto.isHidden());
-
-    return ResponseEntity.ok("Post updated successfully");
-}
-
-
 }
