@@ -35,6 +35,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
+
+                
         try {
                         System.out.println("JWT ==========================-------------------=== " );
 
@@ -79,7 +82,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 @Override
 protected boolean shouldNotFilter(HttpServletRequest request) {
     String path = request.getServletPath();
-    return path.equals("/api/signin") || path.equals("/api/signup");
+    return path.equals("/api/signin") || path.equals("/api/signup") || path.equals("/swagger-ui");
 }
 
 

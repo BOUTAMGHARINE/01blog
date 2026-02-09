@@ -50,7 +50,7 @@ public class WebSecurityConfig {
                 .cors(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/","/api/signin","/api/signup").permitAll()
+                .authorizeHttpRequests(auth -> auth.requestMatchers("/","/api/signin","/api/signup","/swagger-ui/**","/swagger-ui.html","/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated());
 
         http.addFilterBefore(

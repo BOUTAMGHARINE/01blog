@@ -7,21 +7,31 @@ import org.springframework.web.bind.annotation.*;
 //import org.springframework.web.bind.annotation.RequestMapping;
 //import org.springframework.web.bind.annotation.RestController;
 
+import com.example.blog.dto.CommentDto;
 import com.example.blog.entities.Comment;
-import com.example.blog.repository.CommentRepository;;
+import com.example.blog.entities.Post;
+import com.example.blog.repository.CommentRepository;
+import com.example.blog.repository.PostRepository;;
 @RestController
-@RequestMapping("/api/comments")
+@RequestMapping("/api")
 
 public class CommentController {
     @Autowired
     private CommentRepository commentRepository ;
-    @PostMapping
-    public Comment savecomment(@RequestBody Comment comment){
+    @Autowired
+    private PostRepository postRepository;
+    @PostMapping("/addcomment")
+public Comment addComment(@RequestBody CommentDto dto) {
+    Post post = postRepository.findById(dto.getPostId())
+            .orElseThrow(() -> new RuntimeException("Post non trouvé"));
 
-     commentRepository.save(comment);
-     return comment;
+    Comment comment = new Comment();
+    comment.setContent(dto.getContent());
+    comment.setPost(post);
 
-    }
+    return commentRepository.save(comment);
+}
+
 
 
 }

@@ -82,6 +82,12 @@
     <artifactId>tika-core</artifactId>
     <version>2.9.0</version>
    </dependency>
+ <!--swager-->
+    <dependency>
+       <groupId>org.springdoc</groupId>
+       <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.3.0</version>
+     </dependency>
 
 
         <!-- DevTools pour rechargement automatique -->
