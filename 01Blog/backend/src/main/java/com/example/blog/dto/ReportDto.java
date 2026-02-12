@@ -1,20 +1,26 @@
 package com.example.blog.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Data;
 
 
 
 
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+
+
+
+
+
+
+
+
+@NoArgsConstructor @AllArgsConstructor @Data
+
 
 public class ReportDto {
-    private Long reporter_id;
+    private Long reporterId;
     private String reason;
-    private Long reported_id;
-    
-
-
-
-}
+    private Long reportedId;
+    }
