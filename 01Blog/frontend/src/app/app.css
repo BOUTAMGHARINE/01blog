@@ -1,0 +1,50 @@
+/* Conteneur principal pour centrer le formulaire */
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f5f5f5; /* Fond léger */
+}
+
+/* Style de la carte */
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.auth-btn {
+  margin-top: 10px;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.auth-footer {
+  padding: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.auth-footer a {
+  color: #3f51b5;
+  text-decoration: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Alignement des mots de passe sur une ligne pour le register */
+.password-row {
+  display: flex;
+  gap: 10px;
+}
+
+.password-row mat-form-field {
+  flex: 1;
+}

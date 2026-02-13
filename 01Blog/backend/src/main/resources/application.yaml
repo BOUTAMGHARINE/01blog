@@ -1,6 +1,6 @@
 spring:
   application:
-    name:   
+    name: blog-api
 
   datasource:
     url: jdbc:postgresql://localhost:5432/blog
@@ -8,14 +8,25 @@ spring:
     password: blogpass
     driver-class-name: org.postgresql.Driver
 
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 30000
+
   jpa:
     hibernate:
-      ddl-auto: update # change à "validate" ou "create-drop" selon besoin
-    show-sql: true     # affiche les requêtes SQL dans la console
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  web:
+    resources:
+      static-locations: file:uploads/
 jwt:
   secret: mySuperSecretKeyForJwtGeneration123456789
   expiration: 3600000   # 24 heures en millisecondes

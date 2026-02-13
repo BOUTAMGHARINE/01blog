@@ -1,1 +1,44 @@
-<p>register works!</p>
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <mat-card-header>
+      <mat-card-title>Join 01Blog</mat-card-title>
+      <mat-card-subtitle>Start documenting your journey</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form class="auth-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput placeholder="ExampleLearner" required>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" placeholder="student@01blog.com" required>
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+
+        <div class="password-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Password</mat-label>
+            <input matInput type="password" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirm</mat-label>
+            <input matInput type="password" required>
+          </mat-form-field>
+        </div>
+
+        <button mat-raised-button color="accent" class="full-width auth-btn">
+          CREATE MY ACCOUNT
+        </button>
+      </form>
+    </mat-card-content>
+
+    <mat-card-footer class="auth-footer">
+      <span>Already registered? <a routerLink="/login">Sign in</a></span>
+    </mat-card-footer>
+  </mat-card>
+</div>
