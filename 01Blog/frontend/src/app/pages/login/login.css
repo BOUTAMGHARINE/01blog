@@ -99,3 +99,22 @@ mat-card-subtitle {
     gap: 0;
   }
 }
+.error-banner {
+  background-color: #fee2e2; /* Rouge très clair */
+  color: #b91c1c;            /* Rouge foncé pour le texte */
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #fecaca;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.error-banner mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}

@@ -1,5 +1,8 @@
 package com.example.blog.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +25,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:4200") // Autorise Angular
 public class AuthenticationController {
 
     private AuthenticationManager authenticationManager;
@@ -56,14 +61,20 @@ public class AuthenticationController {
     //     return jwtUtils.generateToken(userDetails.getUsername());
     // }
     @PostMapping("/signin")
-    public String authenticateUser(@RequestBody User  user) {
+    public ResponseEntity<?> authenticateUser(@RequestBody User  user) {
     Authentication authentication = authenticationManager.authenticate(
         new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
             user.getUsername(),
             user.getPassword())
     );
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    return jwtUtils.generateToken(userDetails.getUsername());
+
+    Map<String,String> response = new HashMap<>();
+
+    String token = jwtUtils.generateToken(userDetails.getUsername());
+    response.put("token",token);
+
+    return ResponseEntity.ok(response);
     
 }
 

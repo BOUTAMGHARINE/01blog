@@ -4,8 +4,10 @@ import { LoginComponent} from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 
 export const routes: Routes = [
-    {path:"",
-     component:Home,
+    {
+        path:"",
+        component:LoginComponent,
+        pathMatch:'full'
     },
     {path:"login",
      component:LoginComponent,
@@ -13,5 +15,10 @@ export const routes: Routes = [
     {path:"register",
      component:RegisterComponent,
     },
+    {path:"home",
+     component:Home,
+    },
+   
+   
 
 ];
