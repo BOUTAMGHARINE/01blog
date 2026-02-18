@@ -9,29 +9,29 @@
       <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
-          <input matInput placeholder="ExampleLearner" required>
+          <input matInput placeholder="ExampleLearner" required formControlName="username">
           <mat-icon matSuffix>person</mat-icon>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput type="email" placeholder="student@01blog.com" required>
+          <input matInput type="email" placeholder="student@01blog.com" required formControlName="email">
           <mat-icon matSuffix>email</mat-icon>
         </mat-form-field>
 
         <div class="password-row">
           <mat-form-field appearance="outline">
             <mat-label>Password</mat-label>
-            <input matInput type="password" required>
+            <input matInput type="password" required formControlName="password">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Confirm</mat-label>
-            <input matInput type="password" required>
+            <input matInput type="password" required formControlName="confPassword">
           </mat-form-field>
         </div>
 
-        <button mat-raised-button color="accent" class="full-width auth-btn">
+        <button mat-raised-button color="accent" class="full-width auth-btn" type="submit">
           CREATE MY ACCOUNT
         </button>
       </form>

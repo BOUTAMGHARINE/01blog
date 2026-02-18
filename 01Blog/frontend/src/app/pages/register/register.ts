@@ -9,8 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms'; // 1. Importe ReactiveFormsModuleimport { Router } from '@angular/router';
-//import { FormGroup } from '@angular/forms';
-import { email } from '@angular/forms/signals';
+//import { ReactiveFormsModule } from '@angular/forms'; // 1. On importe l'outil iciimport { email } from '@angular/forms/signals';
 import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-register',
@@ -22,7 +21,8 @@ import { AuthService } from '../../services/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    ReactiveFormsModule
   ],
   templateUrl: './register.html', // Doit correspondre à ton fichier register.html
   styleUrls: ['./register.css']    // Doit correspondre à ton fichier register.css
@@ -51,18 +51,20 @@ export class RegisterComponent implements OnInit{
   ]],
   password: ['', [
     Validators.required, 
-    Validators.minLength(8), // Plus sécurisé pour un register
-    Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/) // Optionnel: force Majuscule + Chiffre
+    Validators.minLength(8) // Plus sécurisé pour un register
+  //  Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/) // Optionnel: force Majuscule + Chiffre
   ]],
-  confirmPassword: ['', [Validators.required]]
+  confPassword: ['', [Validators.required]]
 }, );
   }
   
 
 
   onSubmit():void {
+    console.log("Tentative de soumission..."); // <--- AJOUTE ÇA
     if ( this.registerForm.valid){
       const registerData = this.registerForm.value;
+
       console.log('Attempting login with:', registerData);
       this.authService.register(registerData).subscribe({
         next: (res : any)=>{
@@ -77,6 +79,6 @@ export class RegisterComponent implements OnInit{
   
 
 
-  }
+    }
 } // Exportation correcte pour le Router
 }

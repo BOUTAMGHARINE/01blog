@@ -18,6 +18,6 @@ export class AuthService {
   }
   //register
   register(data:any): Observable<any>{
-    return this.http.post(`${this.baseUrl}sigup`,data);
+    return this.http.post(`${this.baseUrl}signup`,data);
   }
 }
