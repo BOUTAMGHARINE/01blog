@@ -7,31 +7,42 @@
 
     <mat-card-content>
       <form class="auth-form" [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Username</mat-label>
-          <input matInput placeholder="ExampleLearner" required formControlName="username">
+          <input matInput placeholder="ExampleLearner" formControlName="username">
           <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="registerForm.get('username')?.hasError('required')">Username is required</mat-error>
+          <mat-error *ngIf="registerForm.get('username')?.hasError('minlength')">Minimum 6 characters</mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email</mat-label>
-          <input matInput type="email" placeholder="student@01blog.com" required formControlName="email">
+          <input matInput type="email" placeholder="student@01blog.com" formControlName="email">
           <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="registerForm.get('email')?.hasError('email')">Invalid email format</mat-error>
         </mat-form-field>
 
         <div class="password-row">
-          <mat-form-field appearance="outline">
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Password</mat-label>
-            <input matInput type="password" required formControlName="password">
-          </mat-form-field>
+            <input matInput type="password" formControlName="password">
+            <mat-error *ngIf="registerForm.get('password')?.hasError('required')">Required</mat-error>
+            <mat-error *ngIf="registerForm.get('password')?.hasError('minlength')">The password must contain at least 8
+              characters</mat-error>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Confirm</mat-label>
-            <input matInput type="password" required formControlName="confPassword">
+          </mat-form-field>
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirmer le mot de passe</mat-label>
+            <input matInput type="password" formControlName="confPassword" [errorStateMatcher]="confirmMatcher">
+            <mat-error *ngIf="registerForm.hasError('mismatch')">
+              Les mots de passe ne correspondent pas
+            </mat-error>
           </mat-form-field>
         </div>
 
-        <button mat-raised-button color="accent" class="full-width auth-btn" type="submit">
+        <button mat-raised-button color="accent" class="auth-btn" type="submit" [disabled]="registerForm.invalid">
           CREATE MY ACCOUNT
         </button>
       </form>

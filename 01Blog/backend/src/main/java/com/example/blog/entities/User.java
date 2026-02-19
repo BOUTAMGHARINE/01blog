@@ -32,6 +32,8 @@ import jakarta.persistence.CascadeType;
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
+     @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
+
     private Long id;
     private String username;
     @Email(message = "Invalid email format")

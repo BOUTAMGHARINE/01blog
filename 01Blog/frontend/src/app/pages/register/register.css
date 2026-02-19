@@ -73,7 +73,16 @@ mat-card-subtitle {
   border-top: 1px solid #edf2f7;
   color: #4a5568;
 }
+/* Garde les deux colonnes de mot de passe égales même avec des erreurs */
+.password-row mat-form-field {
+  flex: 1;
+}
 
+/* Optionnel : Ajuste la couleur du texte d'erreur pour qu'il soit bien visible sur fond blanc */
+mat-error {
+  font-size: 0.75rem;
+  font-weight: 500;
+}
 .auth-footer a {
   color: #667eea;
   text-decoration: none;
@@ -91,6 +100,14 @@ mat-card-subtitle {
 .password-row {
   display: flex;
   gap: 16px;
+}
+/* Pour forcer l'affichage de l'erreur globale sous les deux champs de mot de passe */
+.password-row {
+  margin-bottom: 20px; /* Donne de la place à l'erreur */
+}
+
+mat-error {
+  font-weight: 500;
 }
 
 @media (max-width: 480px) {

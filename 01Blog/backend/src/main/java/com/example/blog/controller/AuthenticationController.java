@@ -100,7 +100,7 @@ public class AuthenticationController {
 
     userRepository.save(user);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully!");
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
 }
 
 
