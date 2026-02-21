@@ -1,4 +1,3 @@
-/* Conteneur principal avec un dégradé dynamique */
 .auth-container {
   display: flex;
   justify-content: center;
@@ -8,7 +7,6 @@
   padding: 20px;
 }
 
-/* Carte avec effet de verre et ombre profonde */
 .auth-card {
   width: 100%;
   max-width: 450px;
@@ -18,7 +16,6 @@
   background: #ffffff;
 }
 
-/* En-tête de la carte */
 mat-card-header {
   margin-bottom: 24px;
   justify-content: center;
@@ -29,85 +26,73 @@ mat-card-title {
   font-size: 2rem !important;
   font-weight: 800 !important;
   color: #2d3748;
-  letter-spacing: -0.5px;
 }
 
-mat-card-subtitle {
-  font-size: 1rem !important;
-  color: #718096 !important;
-  margin-top: 8px;
-}
-
-/* Formulaire et champs */
 .auth-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 }
 
 .full-width {
   width: 100%;
 }
 
-/* Bouton principal stylisé */
+.password-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.password-row mat-form-field {
+  flex: 1;
+}
+
 .auth-btn {
   height: 50px;
   margin-top: 16px;
   font-size: 1.1rem !important;
   font-weight: 600 !important;
-  letter-spacing: 1px;
   border-radius: 12px !important;
-  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.auth-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Pied de page (Liens) */
 .auth-footer {
   margin-top: 24px;
   padding: 16px 0;
   text-align: center;
   border-top: 1px solid #edf2f7;
-  color: #4a5568;
-}
-/* Garde les deux colonnes de mot de passe égales même avec des erreurs */
-.password-row mat-form-field {
-  flex: 1;
 }
 
-/* Optionnel : Ajuste la couleur du texte d'erreur pour qu'il soit bien visible sur fond blanc */
-mat-error {
-  font-size: 0.75rem;
-  font-weight: 500;
+/* Ajoute ceci à ton fichier .css */
+.backend-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #fff5f5;
+  color: #e53e3e;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #feb2b2;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.backend-error mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 .auth-footer a {
   color: #667eea;
   text-decoration: none;
   font-weight: bold;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-
-.auth-footer a:hover {
-  color: #764ba2;
-  text-decoration: underline;
-}
-
-/* Spécifique à la page Register (champs côte à côte) */
-.password-row {
-  display: flex;
-  gap: 16px;
-}
-/* Pour forcer l'affichage de l'erreur globale sous les deux champs de mot de passe */
-.password-row {
-  margin-bottom: 20px; /* Donne de la place à l'erreur */
-}
-
-mat-error {
-  font-weight: 500;
 }
 
 @media (max-width: 480px) {

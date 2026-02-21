@@ -36,13 +36,18 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+                if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        response.setStatus(HttpServletResponse.SC_OK);
+        return; // On s'arrête ici pour les requêtes de pré-vérification
+    }
+
 
                 
         try {
                         System.out.println("JWT ==========================-------------------=== " );
 
             String jwt = parseJwt(request);
-                                    System.out.println("JWT ============rrrrrrrrrrrrr==============-------------------=== " );
+                                    System.out.println("JWT  "+jwt );
 
             if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
                                         System.out.println("JWT ============hhhhhhhhhhhhhhhhh==============-------------------=== " );
@@ -61,17 +66,25 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                         .setAuthentication(authenticationToken);
             }
         } catch (Exception e) {
-                                    System.out.println("JWTUUUUUUUUUUUUUUUUUu ==========================-------------------=== " );
+                                    System.out.println(e );
 
-            log.error("Cannot set user authentication: {}", e);
+            System.out.println("Cannot set user authentication: {}");
         }
         filterChain.doFilter(request, response); // needed for the next filter in the chain
     }
 
     private String parseJwt(HttpServletRequest request) {
-                                System.out.println("JWT =========================uuuuuuuuuuuuuuuuuuu=-------------------=== " );
+          System.out.println("tytytttytyty" );
+                                System.out.println(request );
+                                // Remplace ton code de test par celui-ci temporairement :
+java.util.Enumeration<String> headerNames = request.getHeaderNames();
+while (headerNames.hasMoreElements()) {
+    String name = headerNames.nextElement();
+    System.out.println("Header: " + name + " = " + request.getHeader(name));
+}
 
-        String headerAuth = request.getHeader("Authorization");
+        String headerAuth = request.getHeader("authorization");//authorization
+        System.out.println(headerAuth);
         if (headerAuth != null && headerAuth.startsWith(BEARER_)) {
             return headerAuth.substring(BEARER_.length());
         }

@@ -50,7 +50,10 @@ public class PostController {
 public List<Post> getPosts() {
     List<Post> posts = postRepository.findByHidden(false);
 
+    System.out.println(".(hahowa dkhel)");
+
     posts.forEach(post -> {
+
         if (post.getMediaUrl() != null) {
             post.setMediaUrl("http://localhost:8080/" + Paths.get(post.getMediaUrl()).getFileName());
         }
