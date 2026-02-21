@@ -1,78 +1,85 @@
-<mat-toolbar color="primary" class="navbar mat-elevation-z4">
-  <span class="logo">01Blog</span>
-  <span class="spacer"></span>
-  <button mat-icon-button routerLink="/home"><mat-icon>home</mat-icon></button>
-  <button mat-icon-button><mat-icon>notifications</mat-icon></button>
-  <button mat-icon-button routerLink="/my-block"><mat-icon>account_circle</mat-icon></button>
-</mat-toolbar>
+<nav class="modern-nav">
+  <div class="nav-content">
+    <h1 class="brand-logo">01Blog</h1>
+    <div class="search-bar-container">
+      <mat-icon>search</mat-icon>
+      <input type="text" placeholder="Search...">
+    </div>
+    <div class="nav-links">
+      <button mat-icon-button routerLink="/home" class="nav-btn active"><mat-icon>home</mat-icon></button>
+      <button mat-icon-button class="nav-btn"><mat-icon>notifications</mat-icon></button>
+      <button mat-icon-button routerLink="/my-block" class="nav-btn"><mat-icon>account_circle</mat-icon></button>
+    </div>
+  </div>
+</nav>
 
-<div class="home-layout">
-  <aside class="sidebar">
-    <mat-nav-list>
-      <a mat-list-item routerLink="/home" class="active">
-        <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Feed</span>
-      </a>
-      </mat-nav-list>
-  </aside>
-
-  <main class="main-content">
+<div class="main-layout">
+  <main class="feed-container">
     
-    <mat-card class="create-post-card">
-      <mat-card-content>
-        <div class="create-post-header">
-          <div class="user-avatar-small"></div>
+    <section class="create-post-card">
+      <div class="composer-body">
+        <div class="user-avatar-small"></div>
+        <div class="input-wrapper">
           <textarea #postInput 
-                    placeholder="Share your learning journey..." 
+                    placeholder="What's on your mind?" 
                     (focus)="isExpanded = true"
-                    (blur)="postInput.value === '' ? isExpanded = false : true"></textarea>
+                    class="modern-textarea"></textarea>
+          
+          <div class="media-preview" *ngIf="selectedMediaUrl">
+            <button class="close-preview" (click)="removeMedia()"><mat-icon>close</mat-icon></button>
+            <img [src]="selectedMediaUrl" *ngIf="mediaType === 'image'">
+            <video [src]="selectedMediaUrl" *ngIf="mediaType === 'video'" controls></video>
+          </div>
         </div>
-        
-        <div class="create-post-actions" *ngIf="isExpanded">
-          <button mat-button color="primary">
-            <mat-icon>image</mat-icon> Photo/Video
-          </button>
-          <span class="spacer"></span>
-          <button mat-raised-button color="accent" [disabled]="postInput.value === ''">Post</button>
+      </div>
+
+      <div class="composer-footer" *ngIf="isExpanded">
+        <div class="tool-icons">
+          <button (click)="imageInput.click()"><mat-icon>image</mat-icon></button>
+          <button (click)="videoInput.click()"><mat-icon>videocam</mat-icon></button>
+          <input type="file" #imageInput hidden accept="image/*" (change)="onFileSelected($event, 'image')">
+          <input type="file" #videoInput hidden accept="video/*" (change)="onFileSelected($event, 'video')">
         </div>
-      </mat-card-content>
-    </mat-card>
+        <div class="footer-actions">
+          <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
+          <button class="btn-post" [disabled]="!postInput.value && !selectedMediaUrl" (click)="onPublish(postInput)">Post</button>
+        </div>
+      </div>
+    </section> <div class="posts-list">
+      <p *ngIf="posts.length === 0" style="text-align: center; color: gray; margin: 20px;">
+        Loading posts or no posts available...
+      </p>
 
-    <div class="posts-list" *ngIf="posts.length > 0; else noPosts">
-      <mat-card class="post-card" *ngFor="let post of posts">
-        <mat-card-header>
-          <div mat-card-avatar class="user-avatar"></div>
-          <mat-card-title>{{ post.username }}</mat-card-title>
-          <mat-card-subtitle>{{ post.createdAt | date:'medium' }}</mat-card-subtitle>
-        </mat-card-header>
-        
-        <mat-card-content>
-          <p class="post-text">{{ post.content }}</p>
-        </mat-card-content>
+      <article class="post-card" *ngFor="let post of posts">
+        <header class="post-header">
+          <div class="user-info">
+            <div class="user-avatar"></div>
+            <div class="user-meta">
+              <span class="username">{{ post.username }}</span>
+              <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+            </div>
+          </div>
+        </header>
 
-        <img mat-card-image [src]="post.mediaUrl" alt="Post media" *ngIf="post.mediaUrl">
-        
-        <mat-divider></mat-divider>
+        <div class="post-content">
+          <p>{{ post.content }}</p>
+          <div class="post-media" *ngIf="post.mediaUrl">
+            <img [src]="post.mediaUrl">
+          </div>
+        </div>
 
-        <mat-card-actions class="post-footer">
-          <button mat-button color="primary">
-            <mat-icon>favorite_border</mat-icon> Like ({{post.likesCount}})
+        <div class="post-divider"></div>
+
+        <footer class="post-footer">
+          <button class="like-btn" (click)="post.isLiked = !post.isLiked">
+            <mat-icon [style.color]="post.isLiked ? '#e74c3c' : 'inherit'">
+              {{ post.isLiked ? 'favorite' : 'favorite_border' }}
+            </mat-icon>
+            <span>{{ post.likesCount || 0 }} Likes</span>
           </button>
-          <button mat-button>
-            <mat-icon>chat_bubble_outline</mat-icon> Comment
-          </button>
-          <button mat-icon-button class="report-btn">
-            <mat-icon>outlined_flag</mat-icon>
-          </button>
-        </mat-card-actions>
-      </mat-card>
+        </footer>
+      </article>
     </div>
 
-    <ng-template #noPosts>
-      <div class="empty-state">
-        <mat-icon>auto_awesome</mat-icon>
-        <p>No posts yet. Start following other students!</p>
-      </div>
-    </ng-template>
   </main>
 </div>
