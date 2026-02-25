@@ -68,11 +68,10 @@ public class AuthenticationController {
             user.getPassword())
     );
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-    Map<String,String> response = new HashMap<>();
-
-    String token = jwtUtils.generateToken(userDetails.getUsername());
+     String token = jwtUtils.generateToken(userDetails.getUsername());
+      Map<String,Object> response = new HashMap<>();
     response.put("token",token);
+    response.put("user",userDetails);
 
     return ResponseEntity.ok(response);
     

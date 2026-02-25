@@ -62,7 +62,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             // 2. Autoriser explicitement les requêtes OPTIONS (Preflight)
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers("/", "/api/signin", "/api/signup", "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+            .requestMatchers( "/api/signin", "/api/signup", "/*.jpeg", "/*.jpg", "/*.png").permitAll()
             .anyRequest().authenticated());
 
     http.addFilterBefore(

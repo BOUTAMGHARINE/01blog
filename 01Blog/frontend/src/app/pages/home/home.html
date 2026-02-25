@@ -15,16 +15,14 @@
 
 <div class="main-layout">
   <main class="feed-container">
-    
+
     <section class="create-post-card">
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput 
-                    placeholder="What's on your mind?" 
-                    (focus)="isExpanded = true"
-                    class="modern-textarea"></textarea>
-          
+          <textarea #postInput placeholder="What's on your mind?" (input)="0" (focus)="isExpanded.set(true)"
+            class="modern-textarea"></textarea>
+
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()"><mat-icon>close</mat-icon></button>
             <img [src]="selectedMediaUrl" *ngIf="mediaType === 'image'">
@@ -33,7 +31,7 @@
         </div>
       </div>
 
-      <div class="composer-footer" *ngIf="isExpanded">
+      <div class="composer-footer" *ngIf="isExpanded()">
         <div class="tool-icons">
           <button (click)="imageInput.click()"><mat-icon>image</mat-icon></button>
           <button (click)="videoInput.click()"><mat-icon>videocam</mat-icon></button>
@@ -42,15 +40,20 @@
         </div>
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button class="btn-post" [disabled]="!postInput.value && !selectedMediaUrl" (click)="onPublish(postInput)">Post</button>
+          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+            (click)="onPublish(postInput)">
+            Post
+          </button>
         </div>
       </div>
-    </section> <div class="posts-list">
-      <p *ngIf="posts.length === 0" style="text-align: center; color: gray; margin: 20px;">
-        Loading posts or no posts available...
-      </p>
+    </section>
 
-      <article class="post-card" *ngFor="let post of posts">
+    <div class="posts-list">
+      <div *ngIf="posts().length === 0" class="loading-state">
+        <p>Loading your feed...</p>
+      </div>
+
+      <article class="post-card" *ngFor="let post of posts()">
         <header class="post-header">
           <div class="user-info">
             <div class="user-avatar"></div>
@@ -71,15 +74,12 @@
         <div class="post-divider"></div>
 
         <footer class="post-footer">
-          <button class="like-btn" (click)="post.isLiked = !post.isLiked">
-            <mat-icon [style.color]="post.isLiked ? '#e74c3c' : 'inherit'">
-              {{ post.isLiked ? 'favorite' : 'favorite_border' }}
-            </mat-icon>
+          <button class="like-btn" [class.liked]="post.isLiked" (click)="toggleLike(post)">
+            <mat-icon>{{ post.isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
             <span>{{ post.likesCount || 0 }} Likes</span>
           </button>
         </footer>
       </article>
     </div>
-
   </main>
 </div>

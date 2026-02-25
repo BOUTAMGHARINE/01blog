@@ -24,7 +24,7 @@ export class PostService {
   // 3. Créer un nouveau post
   // Utilise FormData si tu envoies une image/vidéo
   createPost(postData: FormData): Observable<any> {
-    return this.http.post<any>(this.apiUrl, postData);
+    return this.http.post<any>(`${this.apiUrl}/addpost`, postData);
   }
 
   // 4. Supprimer un post
