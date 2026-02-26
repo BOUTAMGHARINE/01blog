@@ -68,11 +68,12 @@ public class AuthenticationController {
             user.getPassword())
     );
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-     String token = jwtUtils.generateToken(userDetails.getUsername());
-      Map<String,Object> response = new HashMap<>();
+    String token = jwtUtils.generateToken(userDetails.getUsername());
+    Map<String,Object> response = new HashMap<>();
+    User userInformations = userRepository.findByUsername(userDetails.getUsername());
       //
     response.put("token",token);
-    response.put("user",userDetails);
+    response.put("user",userInformations);
 
     return ResponseEntity.ok(response);
     

@@ -14,6 +14,7 @@ import com.example.blog.entities.User;
 import com.example.blog.repository.PostRepository;
 import com.example.blog.repository.UserRepository;
 import com.example.blog.service.PostService;
+import java.util.Collections;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -49,6 +50,7 @@ public class PostController {
 @GetMapping("getposts")
 public List<Post> getPosts() {
     List<Post> posts = postRepository.findByHidden(false);
+    Collections.reverse(posts);
 
     System.out.println(".(hahowa dkhel)");
 

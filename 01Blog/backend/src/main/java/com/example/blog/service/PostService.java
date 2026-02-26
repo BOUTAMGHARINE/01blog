@@ -48,10 +48,11 @@ public class PostService {
     }
     Tika tika = new Tika();
    String mimeType = tika.detect(file.getBytes()); // détecte le type réel
+   System.out.println(".(----------------------------------------------------------------------------------------------------)"+mimeType);
 
 
     List<String> allowedImageTypes = List.of("image/jpeg", "image/png", "image/gif");
-    List<String> allowedVideoTypes = List.of("video/mp4", "video/avi", "video/mov");
+    List<String> allowedVideoTypes = List.of("video/mp4", "video/avi", "video/mov","video/webm","application/x-matroska");
 
     if (allowedImageTypes.contains(mimeType)) {
         post.setMediaType("IMAGE");
@@ -61,7 +62,8 @@ public class PostService {
         throw new RuntimeException("Type de fichier non autorisé: " + mimeType);
     }
 
-    long maxSize = 10 * 1024 * 1024; // 10 Mo
+    long maxSize = 40 * 1024 * 1024; // 10 Mo
+    System.out.println(".(hdjzeee-----------------------------------------------------------)");
     if (file.getSize() > maxSize) {
         throw new RuntimeException("Fichier trop volumineux. Max 10 Mo.");
     }

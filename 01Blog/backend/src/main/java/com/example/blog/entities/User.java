@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.CascadeType;
+import lombok.Getter;
+import lombok.Setter;
 
 
 @Entity
@@ -27,12 +29,14 @@ import jakarta.persistence.CascadeType;
 @AllArgsConstructor
 @Data 
 @ToString(exclude = "posts")
+@Setter
+@Getter
 
 @Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-     @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
+    // @JsonProperty(access =  JsonProperty.Access.WRITE_ONLY)
 
     private Long id;
     private String username;
@@ -45,5 +49,9 @@ public class User {
     
     @JsonIgnore
     private List<Post> posts;
+
+    // public Long getId() {
+    //     throw new UnsupportedOperationException("Not supported yet.");
+    // }
 
 } 

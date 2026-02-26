@@ -62,7 +62,18 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .authorizeHttpRequests(auth -> auth
             // 2. Autoriser explicitement les requêtes OPTIONS (Preflight)
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers( "/api/signin", "/api/signup", "/*.jpeg", "/*.jpg", "/*.png").permitAll()
+            .requestMatchers(
+    "/api/signin",
+    "/api/signup",
+    "/*.jpeg",
+    "/*.jpg",
+    "/*.png",
+    "/*.mp4",
+    "/*.avi",
+    "/*.mov",
+    "/*.webm",
+    "/*.mkv"
+).permitAll()
             .anyRequest().authenticated());
 
     http.addFilterBefore(
