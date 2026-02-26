@@ -70,6 +70,7 @@ public class AuthenticationController {
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
      String token = jwtUtils.generateToken(userDetails.getUsername());
       Map<String,Object> response = new HashMap<>();
+      //
     response.put("token",token);
     response.put("user",userDetails);
 
