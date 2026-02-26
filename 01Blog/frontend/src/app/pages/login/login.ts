@@ -53,6 +53,7 @@ export class LoginComponent implements OnInit {
           if (response.token) {
             // Bonne pratique : stocker le token en string pure (le backend renvoie souvent déjà un string)
             localStorage.setItem('token', response.token);
+            localStorage.setItem('user',JSON.stringify(response.user));
           }
           console.log('Login successful!');
           this.router.navigate(['home']);
