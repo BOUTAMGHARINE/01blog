@@ -32,49 +32,53 @@ public class PostService {
     private final String UPLOAD_DIR = "uploads";
 
     public Post createPost(PostRequestDTO dto, MultipartFile file) throws IOException {
-        User author = userRepository.findById(dto.getAuthorId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    User author = userRepository.findById(dto.getAuthorId())
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Post post = new Post();
-        post.setContent(dto.getContent());
-        post.setHidden(dto.isHidden());
-        post.setAuthor(author);
-        post.setCreatedAt(LocalDateTime.now());
+    Post post = new Post();
+    post.setContent(dto.getContent());
+    post.setHidden(dto.isHidden());
+    post.setAuthor(author);
+    post.setCreatedAt(LocalDateTime.now());
 
-      if (file != null && !file.isEmpty()) {
-    String contentType = file.getContentType();
-    if (contentType == null) {
-        throw new RuntimeException("Impossible de détecter le type de fichier");
+    if (file != null && !file.isEmpty()) {
+        // 1. Détection du type MIME réel avec Tika
+        Tika tika = new Tika();
+        String mimeType = tika.detect(file.getBytes());
+        System.out.println("MimeType détecté : " + mimeType);
+
+        List<String> allowedImageTypes = List.of("image/jpeg", "image/png", "image/gif");
+        List<String> allowedVideoTypes = List.of("video/mp4", "video/avi", "video/mov", "video/webm", "application/x-matroska");
+
+        if (allowedImageTypes.contains(mimeType)) {
+            post.setMediaType("IMAGE");
+        } else if (allowedVideoTypes.contains(mimeType)) {
+            post.setMediaType("VIDEO");
+        } else {
+            throw new RuntimeException("Type de fichier non autorisé: " + mimeType);
+        }
+
+        // 2. Vérification de la taille (40 Mo comme configuré dans ton code)
+        long maxSize = 40 * 1024 * 1024; 
+        if (file.getSize() > maxSize) {
+            throw new RuntimeException("Fichier trop volumineux. Max 40 Mo.");
+        }
+
+        // 3. Nettoyage du nom de fichier (Supprime les ":" et les espaces)
+        String originalName = file.getOriginalFilename() != null ? file.getOriginalFilename() : "file";
+        // On remplace tout ce qui n'est pas lettre, chiffre ou point par "_"
+        String cleanName = originalName.replaceAll("[^a-zA-Z0-9.]", "_");
+        String fileName = System.currentTimeMillis() + "_" + cleanName;
+
+        // 4. Sauvegarde physique sur le disque
+        Files.createDirectories(Paths.get(UPLOAD_DIR));
+        Path filePath = Paths.get(UPLOAD_DIR, fileName);
+        Files.write(filePath, file.getBytes());
+
+        // 5. On stocke UNIQUEMENT le nom du fichier en base de données
+        post.setMediaUrl(fileName);
     }
-    Tika tika = new Tika();
-   String mimeType = tika.detect(file.getBytes()); // détecte le type réel
-   System.out.println(".(----------------------------------------------------------------------------------------------------)"+mimeType);
 
-
-    List<String> allowedImageTypes = List.of("image/jpeg", "image/png", "image/gif");
-    List<String> allowedVideoTypes = List.of("video/mp4", "video/avi", "video/mov","video/webm","application/x-matroska");
-
-    if (allowedImageTypes.contains(mimeType)) {
-        post.setMediaType("IMAGE");
-    } else if (allowedVideoTypes.contains(mimeType)) {
-        post.setMediaType("VIDEO");
-    } else {
-        throw new RuntimeException("Type de fichier non autorisé: " + mimeType);
-    }
-
-    long maxSize = 40 * 1024 * 1024; // 10 Mo
-    System.out.println(".(hdjzeee-----------------------------------------------------------)");
-    if (file.getSize() > maxSize) {
-        throw new RuntimeException("Fichier trop volumineux. Max 10 Mo.");
-    }
-
-    Files.createDirectories(Paths.get(UPLOAD_DIR));
-    String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-    Path filePath = Paths.get(UPLOAD_DIR, fileName);
-    Files.write(filePath, file.getBytes());
-    post.setMediaUrl(filePath.toString());
+    return postRepository.save(post);
 }
-
-        return postRepository.save(post);
-    }
 }

@@ -44,6 +44,10 @@ public class PostController {
             @RequestPart(value = "file", required = false) MultipartFile file
     ) throws IOException {
         Post post = postService.createPost(dto, file);
+        if (post.getMediaUrl() != null) {
+            post.setMediaUrl("http://localhost:8080/" + post.getMediaUrl());
+
+        }
         return ResponseEntity.ok(post);
     }
 

@@ -81,8 +81,7 @@ export class HomeComponent implements OnInit {
   }
 
   onPublish(input: HTMLTextAreaElement): void {
-    // if (!input.value && !this.selectedFile) return;
-    console.log("tytytytytytytytytytyty");
+    
      const authorId = this.authService.getUserId();
      if (authorId === null || authorId === undefined) {
     console.error("Erreur : Impossible de trouver l'ID de l'auteur.",authorId);
