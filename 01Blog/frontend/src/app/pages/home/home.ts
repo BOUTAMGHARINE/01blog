@@ -11,6 +11,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post';
+import { ReactionService } from '../../services/reaction';
 
 @Component({
   selector: 'app-home',
@@ -38,13 +39,16 @@ export class HomeComponent implements OnInit {
   selectedFile: File | null = null;
   selectedMediaUrl: string | null = null;
   mediaType: 'image' | 'video' | null = null;
+  currentUserId: number | null = null;
 
  constructor(
   private postService: PostService,
-  private authService: AuthService // Injecte l'AuthService ici
+  private authService: AuthService, // Injecte l'AuthService ici
+  private reactionService: ReactionService // Nouvel inject
 ) {}
   ngOnInit(): void {
     this.loadPosts();
+    this.currentUserId = this.authService.getUserId();
   }
 
   loadPosts(): void {
@@ -103,10 +107,47 @@ export class HomeComponent implements OnInit {
       error: (err) => console.error("Error publishing", err)
     });
   }
+// Récupère l'ID de l'utilisateur connecté au démarrage
 
-  toggleLike(post: any): void {
-    // Logique locale pour le bouton like
-    post.isLiked = !post.isLiked;
-    post.likesCount = post.isLiked ? (post.likesCount || 0) + 1 : (post.likesCount || 0) - 1;
-  }
+/**
+ * Vérifie si l'utilisateur actuel a liké ce post
+ */
+checkIfUserLiked(post: any): boolean {
+  if (!this.currentUserId || !post.reactions) return false;
+  
+  // On cherche si un objet dans le tableau 'reactions' possède l'id de l'user actuel
+  return post.reactions.some((reaction: any) => reaction.user.id === this.currentUserId);
+}
+
+/**
+ * Action lors du clic sur le bouton Like
+ */
+// Récupère l'ID de l'utilisateur connecté au démarrage
+
+/**
+ * Vérifie si l'utilisateur actuel a liké ce post
+ */
+
+/**
+ * Action lors du clic sur le bouton Like
+ */
+toggleLike(post: any): void {
+  if (!this.currentUserId) return;
+
+  this.reactionService.toggleLike(post.id, this.currentUserId).subscribe({
+    next: (updatedReactions: any[]) => {
+      // On met à jour le signal "posts" de manière réactive
+      this.posts.update(allPosts => 
+        allPosts.map(p => {
+          if (p.id === post.id) {
+            // On retourne une copie du post avec les nouvelles réactions envoyées par le serveur
+            return { ...p, reactions: updatedReactions };
+          }
+          return p;
+        })
+      );
+    },
+    error: (err) => console.error("Erreur lors du like", err)
+  });
+}
 }

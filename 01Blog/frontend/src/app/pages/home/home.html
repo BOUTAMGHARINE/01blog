@@ -26,11 +26,8 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput 
-                    placeholder="What's on your mind?" 
-                    (input)="0" 
-                    (focus)="isExpanded.set(true)"
-                    class="modern-textarea"></textarea>
+          <textarea #postInput placeholder="What's on your mind?" (input)="0" (focus)="isExpanded.set(true)"
+            class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()">
@@ -46,17 +43,15 @@
         <div class="tool-icons">
           <button (click)="imageInput.click()"><mat-icon>image</mat-icon></button>
           <button (click)="videoInput.click()"><mat-icon>videocam</mat-icon></button>
-          
+
           <input type="file" #imageInput hidden accept="image/*" (change)="onFileSelected($event, 'image')">
           <input type="file" #videoInput hidden accept="video/*" (change)="onFileSelected($event, 'video')">
         </div>
-        
+
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button 
-                  class="btn-post" 
-                  [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-                  (click)="onPublish(postInput)">
+          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+            (click)="onPublish(postInput)">
             Post
           </button>
         </div>
@@ -74,7 +69,7 @@
             <div class="user-avatar"></div>
             <div class="user-meta">
               <span class="username" style="margin-right: 12px;">{{ post.author?.username || 'User' }}</span>
-              
+
 
               <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
             </div>
@@ -83,9 +78,9 @@
 
         <div class="post-content">
           <p>{{ post.content }}</p>
-          
+
           <div class="post-media" *ngIf="post.mediaUrl">
-            
+
             <img [src]="post.mediaUrl" *ngIf="post.mediaType === 'IMAGE'" alt="Post image">
 
             <video controls width="100%" *ngIf="post.mediaType === 'VIDEO'">
@@ -93,16 +88,18 @@
               <source [src]="post.mediaUrl" type="video/webm">
               Your browser does not support the video tag.
             </video>
-            
+
           </div>
         </div>
 
         <div class="post-divider"></div>
 
         <footer class="post-footer">
-          <button class="like-btn" [class.liked]="post.isLiked" (click)="toggleLike(post)">
-            <mat-icon>{{ post.isLiked ? 'favorite' : 'favorite_border' }}</mat-icon>
-            <span>{{ post.likesCount || 0 }} Likes</span>
+          <button class="like-btn" [class.liked]="checkIfUserLiked(post)" (click)="toggleLike(post)">
+
+            <mat-icon>{{ checkIfUserLiked(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
+
+            <span>{{ post.reactions?.length || 0 }} Likes</span>
           </button>
         </footer>
       </article>

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -40,6 +41,9 @@ public class Post {
     private User author;
     @OneToMany(mappedBy="post",cascade=CascadeType.ALL)
     private List<Comment> comments;
+    @JsonManagedReference
+    @OneToMany(mappedBy="post",cascade=CascadeType.ALL)
+    private List<Reaction> reactions;
 
 
 }

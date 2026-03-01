@@ -1,5 +1,7 @@
 package com.example.blog.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,29 +34,28 @@ public class ReactionController {
    @PostMapping("/api/reaction")
 
 @Transactional
-public ResponseEntity<String> saveReaction(@RequestBody ReactionDto dto) {
-    System.out.println(".(--------------------------------------------)"+dto.getUserId());
-      User user = userRepository.findById(dto.getUserId())
+public ResponseEntity<List<Reaction>> saveReaction(@RequestBody ReactionDto dto) {
+    User user = userRepository.findById(dto.getUserId())
             .orElseThrow(() -> new RuntimeException("User not found"));
 
     Post post = postRepository.findById(dto.getPostId())
             .orElseThrow(() -> new RuntimeException("Post not found"));
 
-  
-
     if (reactionService.hasUserReactedToPost(post, user)) {
-
         reactionrepository.deleteByUserIdAndPostId(user.getId(), post.getId());
-
     } else {
-
         Reaction reaction = new Reaction();
         reaction.setPost(post);
         reaction.setUser(user);
         reactionrepository.save(reaction);
     }
 
-    return ResponseEntity.ok("Reaction updated");
+    // --- LA MODIFICATION EST ICI ---
+    // On récupère la liste fraîche des réactions pour CE post précis
+    List<Reaction> updatedReactions = reactionrepository.findByPostId(post.getId());
+    
+    // On renvoie la liste au lieu d'une simple String
+    return ResponseEntity.ok(updatedReactions);
 }
 
 

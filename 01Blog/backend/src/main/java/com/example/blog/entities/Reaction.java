@@ -1,5 +1,7 @@
 package com.example.blog.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +29,7 @@ public class Reaction {
     private Long id;
     @ManyToOne(fetch=FetchType.EAGER)
     @JoinColumn(name = "post_id", nullable = false  , referencedColumnName = "id")
+    @JsonBackReference
     private Post post;
     @ManyToOne
     @JoinColumn(name="user_id",nullable = false ,referencedColumnName = "id") 
