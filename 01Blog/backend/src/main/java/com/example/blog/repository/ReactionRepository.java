@@ -6,6 +6,8 @@ import com.example.blog.entities.Reaction;
 
 public interface ReactionRepository extends JpaRepository<Reaction,Long>{
 
+  void deleteByUserIdAndPostId(Long userId, Long postId);
+  boolean existsByUserIdAndPostId(Long userId, Long postId);
     
 
 }

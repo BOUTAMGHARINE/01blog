@@ -73,7 +73,9 @@
           <div class="user-info">
             <div class="user-avatar"></div>
             <div class="user-meta">
-              <span class="username">{{ post.author?.username || 'User' }}</span>
+              <span class="username" style="margin-right: 12px;">{{ post.author?.username || 'User' }}</span>
+              
+
               <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
             </div>
           </div>
