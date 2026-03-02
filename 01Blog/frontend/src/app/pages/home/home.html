@@ -26,8 +26,11 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput placeholder="What's on your mind?" (input)="0" (focus)="isExpanded.set(true)"
-            class="modern-textarea"></textarea>
+          <textarea #postInput 
+                    placeholder="What's on your mind?" 
+                    (input)="0" 
+                    (focus)="isExpanded.set(true)"
+                    class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()">
@@ -50,8 +53,9 @@
 
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-            (click)="onPublish(postInput)">
+          <button mat-flat-button class="btn-post" 
+                  [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+                  (click)="onPublish(postInput)">
             Post
           </button>
         </div>
@@ -69,8 +73,6 @@
             <div class="user-avatar"></div>
             <div class="user-meta">
               <span class="username" style="margin-right: 12px;">{{ post.author?.username || 'User' }}</span>
-
-
               <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
             </div>
           </div>
@@ -80,15 +82,11 @@
           <p>{{ post.content }}</p>
 
           <div class="post-media" *ngIf="post.mediaUrl">
-
             <img [src]="post.mediaUrl" *ngIf="post.mediaType === 'IMAGE'" alt="Post image">
-
             <video controls width="100%" *ngIf="post.mediaType === 'VIDEO'">
               <source [src]="post.mediaUrl" type="video/mp4">
-              <source [src]="post.mediaUrl" type="video/webm">
               Your browser does not support the video tag.
             </video>
-
           </div>
         </div>
 
@@ -96,12 +94,22 @@
 
         <footer class="post-footer">
           <button class="like-btn" [class.liked]="checkIfUserLiked(post)" (click)="toggleLike(post)">
-
             <mat-icon>{{ checkIfUserLiked(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
-
             <span>{{ post.reactions?.length || 0 }} Likes</span>
           </button>
+
+          <button class="comment-btn" (click)="post.showComments = !post.showComments">
+            <mat-icon>chat_bubble_outline</mat-icon>
+            <span>{{ post.comments?.length || 0 }} Comments</span>
+          </button>
         </footer>
+
+        <app-post-comments 
+          *ngIf="post.showComments" 
+          [postId]="post.id" 
+          [comments]="post.comments">
+        </app-post-comments>
+
       </article>
     </div>
   </main>

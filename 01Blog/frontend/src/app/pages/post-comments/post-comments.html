@@ -1,0 +1,29 @@
+<div class="comments-container">
+  <mat-divider></mat-divider>
+  
+  <div class="comments-list" *ngIf="commentsSignal().length > 0">
+    <div class="comment-item" *ngFor="let comment of commentsSignal()">
+      <div class="comment-avatar-mini">
+        {{ comment.user?.username?.charAt(0) | uppercase }}
+      </div>
+      <div class="comment-bubble">
+        <span class="comment-user">{{ comment.user?.username }}</span>
+        <p class="comment-text">{{ comment.content }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="comment-input-area">
+    <mat-form-field appearance="outline" class="comment-form-field">
+      <mat-label>Write a comment...</mat-label>
+      <input matInput #cInput placeholder="Type something..." (keyup.enter)="submitComment(cInput)">
+      
+      <button matSuffix mat-icon-button 
+              (click)="submitComment(cInput)" 
+              [disabled]="!cInput.value.trim()"
+              color="primary">
+        <mat-icon>send</mat-icon>
+      </button>
+    </mat-form-field>
+  </div>
+</div>

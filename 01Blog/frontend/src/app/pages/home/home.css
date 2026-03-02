@@ -132,3 +132,24 @@
   padding-top: 10px;
   border-top: 1px solid #f1f5f9;
 }
+
+
+.post-footer {
+  display: flex;
+  gap: 15px; /* Espace entre Like et Comment */
+  padding: 8px 16px;
+}
+
+.comment-btn {
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #65676b;
+  cursor: pointer;
+}
+
+.comment-btn:hover {
+  color: #1877f2; /* Bleu type Facebook au survol */
+}

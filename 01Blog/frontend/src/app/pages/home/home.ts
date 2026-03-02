@@ -12,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post';
 import { ReactionService } from '../../services/reaction';
+import { PostCommentsComponent } from '../post-comments/post-comments';
 
 @Component({
   selector: 'app-home',
@@ -24,7 +25,8 @@ import { ReactionService } from '../../services/reaction';
     MatIconModule, 
     MatListModule,
     MatToolbarModule,
-    MatDividerModule
+    MatDividerModule,
+    PostCommentsComponent
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
