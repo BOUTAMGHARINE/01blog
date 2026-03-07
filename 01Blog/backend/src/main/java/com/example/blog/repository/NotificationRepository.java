@@ -11,5 +11,5 @@ import com.example.blog.entities.Notification;
 
 public interface NotificationRepository extends JpaRepository<Notification,Long> {
 
-
+ boolean existsById(long id);
 }

@@ -54,6 +54,8 @@ export class PostCommentsComponent implements OnInit {
     }
 
     this.commentService.addComment(this.postId, this.currentUserId, text).subscribe({
+      
+      
       next: (newComment) => {
         // Mise à jour réactive : on ajoute le nouveau commentaire à la liste
         this.commentsSignal.update(list => [...list, newComment]);
@@ -64,4 +66,15 @@ export class PostCommentsComponent implements OnInit {
       }
     });
   }
+  deleteComment(commentId: number): void {
+  if (confirm('Are you sure you want to delete this comment?')) {
+    this.commentService.deleteComment(commentId).subscribe({
+      next: () => {
+        // Mise à jour réactive du signal : on filtre pour enlever le commentaire supprimé
+        this.commentsSignal.update(list => list.filter(c => c.id !== commentId));
+      },
+      error: (err) => console.error("Error deleting comment", err)
+    });
+  }
+}
 }

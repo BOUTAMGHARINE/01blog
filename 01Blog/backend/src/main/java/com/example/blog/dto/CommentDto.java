@@ -8,4 +8,5 @@ import lombok.Setter;
 public class CommentDto {
     private String content;
     private Long postId; // l'id du post auquel le commentaire appartient
+    private Long userId;
 }

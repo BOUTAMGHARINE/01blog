@@ -49,6 +49,9 @@ public class User {
     
     @JsonIgnore
     private List<Post> posts;
+    @OneToMany(mappedBy="user",cascade=CascadeType.ALL)
+    @JsonIgnore
+    private List<Comment> comments;
 
     // public Long getId() {
     //     throw new UnsupportedOperationException("Not supported yet.");

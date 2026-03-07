@@ -4,6 +4,7 @@ import { RouterLink } from '@angular/router';
 
 // Modules Material
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -26,7 +27,8 @@ import { PostCommentsComponent } from '../post-comments/post-comments';
     MatListModule,
     MatToolbarModule,
     MatDividerModule,
-    PostCommentsComponent
+    PostCommentsComponent,
+    MatMenuModule
   ],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
@@ -152,4 +154,37 @@ toggleLike(post: any): void {
     error: (err) => console.error("Erreur lors du like", err)
   });
 }
+// Active le mode édition pour un post précis
+startEdit(post: any) {
+  post.isEditing = true;
+}
+
+// Envoie la mise à jour au serveur
+updatePost(post: any, newContent: string) {
+  console.log("hahowa dkhel");
+  
+  if (!newContent.trim()) return;
+
+  this.postService.updatePost(post.id, newContent).subscribe({
+    next: (updatedPost) => {
+      this.posts.update(allPosts => 
+        allPosts.map(p => p.id === post.id ? { ...p, content: newContent, isEditing: false } : p)
+      );
+    },
+    error: (err) => console.error("Update failed", err)
+  });
+}
+
+// Ajoute cette méthode pour corriger l'erreur TS4111
+  onDeletePost(postId: number): void {
+    if (confirm('Are you sure you want to delete this post?')) {
+      this.postService.deletePost(postId).subscribe({
+        next: () => {
+          // Mise à jour de la liste locale
+          this.posts.update(list => list.filter(p => p.id !== postId));
+        },
+        error: (err) => console.error("Delete failed", err)
+      });
+    }
+  }
 }

@@ -28,5 +28,10 @@ public class Comment {
     @JsonIgnore
 
     private Post post;
+    @ManyToOne
+    @JoinColumn(name="user_id",nullable=false,referencedColumnName="id")
+    // @JsonIgnore
+     private User user;
+
 
 }

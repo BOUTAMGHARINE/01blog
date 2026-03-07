@@ -26,11 +26,8 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput 
-                    placeholder="What's on your mind?" 
-                    (input)="0" 
-                    (focus)="isExpanded.set(true)"
-                    class="modern-textarea"></textarea>
+          <textarea #postInput placeholder="What's on your mind?" (input)="0" (focus)="isExpanded.set(true)"
+            class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()">
@@ -46,18 +43,13 @@
         <div class="tool-icons">
           <button (click)="imageInput.click()"><mat-icon>image</mat-icon></button>
           <button (click)="videoInput.click()"><mat-icon>videocam</mat-icon></button>
-
           <input type="file" #imageInput hidden accept="image/*" (change)="onFileSelected($event, 'image')">
           <input type="file" #videoInput hidden accept="video/*" (change)="onFileSelected($event, 'video')">
         </div>
-
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button class="btn-post" 
-                  [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-                  (click)="onPublish(postInput)">
-            Post
-          </button>
+          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+            (click)="onPublish(postInput)">Post</button>
         </div>
       </div>
     </section>
@@ -72,20 +64,43 @@
           <div class="user-info">
             <div class="user-avatar"></div>
             <div class="user-meta">
-              <span class="username" style="margin-right: 12px;">{{ post.author?.username || 'User' }}</span>
+              <span class="username">{{ post.author?.username || 'User' }}</span>
               <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
             </div>
+          </div>
+
+          <div class="post-options" *ngIf="post.author?.id === currentUserId">
+            <button mat-icon-button [matMenuTriggerFor]="postMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #postMenu="matMenu">
+              <button mat-menu-item (click)="post.isEditing = true">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="onDeletePost(post.id)">
+                <mat-icon color="warn">delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
           </div>
         </header>
 
         <div class="post-content">
-          <p>{{ post.content }}</p>
+          <p *ngIf="!post.isEditing">{{ post.content }}</p>
 
-          <div class="post-media" *ngIf="post.mediaUrl">
+          <div class="edit-mode-container" *ngIf="post.isEditing">
+            <textarea #editInput class="modern-textarea" [value]="post.content"></textarea>
+            <div class="edit-actions">
+              <button class="btn-cancel" (click)="post.isEditing = false">Cancel</button>
+              <button class="btn-save" (click)="updatePost(post, editInput.value)">Save</button>
+            </div>
+          </div>
+
+          <div class="post-media" *ngIf="post.mediaUrl && !post.isEditing">
             <img [src]="post.mediaUrl" *ngIf="post.mediaType === 'IMAGE'" alt="Post image">
             <video controls width="100%" *ngIf="post.mediaType === 'VIDEO'">
               <source [src]="post.mediaUrl" type="video/mp4">
-              Your browser does not support the video tag.
             </video>
           </div>
         </div>
@@ -104,12 +119,8 @@
           </button>
         </footer>
 
-        <app-post-comments 
-          *ngIf="post.showComments" 
-          [postId]="post.id" 
-          [comments]="post.comments">
+        <app-post-comments *ngIf="post.showComments" [postId]="post.id" [comments]="post.comments">
         </app-post-comments>
-
       </article>
     </div>
   </main>
