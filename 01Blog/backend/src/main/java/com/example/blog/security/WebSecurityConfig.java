@@ -56,10 +56,12 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
     http
         .csrf(AbstractHttpConfigurer::disable)
         // 1. ACTIVER le CORS (ne pas le désactiver !)
-        .cors(Customizer.withDefaults()) 
+        .cors(Customizer.withDefaults())
+        .csrf(csrf -> csrf.disable()) 
         .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // 2. Autoriser explicitement les requêtes OPTIONS (Preflight)
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -90,8 +92,8 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
 public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Ton frontend
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+    configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
     configuration.setAllowCredentials(true);
     
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
