@@ -1,0 +1,122 @@
+<div class="admin-wrapper">
+  <header class="admin-header">
+    <div class="header-title">
+      <mat-icon>security</mat-icon>
+      <h1>Admin Dashboard</h1>
+    </div>
+    <button mat-stroked-button color="primary" routerLink="/home">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Feed
+    </button>
+  </header>
+
+  <mat-tab-group dynamicHeight animationDuration="500ms">
+    
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">people</mat-icon>
+        Users Management
+      </ng-template>
+
+      <div class="tab-content">
+        <div class="table-container mat-elevation-z2">
+          <table mat-table [dataSource]="users()" class="modern-table">
+            
+            <ng-container matColumnDef="id">
+              <th mat-header-cell *matHeaderCellDef> ID </th>
+              <td mat-cell *matCellDef="let user"> #{{user.id}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="username">
+              <th mat-header-cell *matHeaderCellDef> Username </th>
+              <td mat-cell *matCellDef="let user"> 
+                <div class="user-cell">
+                  <div class="user-avatar-mini"></div>
+                  <strong>{{user.username}}</strong>
+                </div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef> Role </th>
+              <td mat-cell *matCellDef="let user"> 
+                <span class="role-badge" [class.admin-role]="user.role === 'ADMIN'">
+                  {{user.role}}
+                </span> 
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let user">
+                <button mat-icon-button color="warn" 
+                        (click)="deleteUser(user.id)" 
+                        *ngIf="user.role !== 'ADMIN'"
+                        title="Delete User">
+                  <mat-icon>person_remove</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['id', 'username', 'role', 'actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['id', 'username', 'role', 'actions'];"></tr>
+          </table>
+          
+          <div class="empty-state" *ngIf="users().length === 0">
+            <p>No users found.</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">article</mat-icon>
+        Content Moderation
+      </ng-template>
+
+      <div class="tab-content">
+        <div class="admin-post-list">
+          <div class="admin-post-item" *ngFor="let post of posts()" [class.is-hidden]="post.hidden">
+            
+            <div class="post-info">
+              <div class="post-meta-admin">
+                <strong>@{{post.author?.username || 'Unknown'}}</strong>
+                <span class="badge-hidden" *ngIf="post.hidden">HIDDEN</span>
+                <span class="post-date">{{ post.createdAt | date:'short' }}</span>
+              </div>
+              <p class="post-preview">{{post.content}}</p>
+              
+              <div class="post-media-mini" *ngIf="post.mediaUrl">
+                <mat-icon>image</mat-icon> Attached Media
+              </div>
+            </div>
+
+            <div class="admin-actions">
+              <button mat-icon-button 
+                      [color]="post.hidden ? 'basic' : 'accent'" 
+                      (click)="onHidePost(post.id)" 
+                      [disabled]="post.hidden" 
+                      [title]="post.hidden ? 'Already Hidden' : 'Hide Post from Feed'">
+                <mat-icon>{{ post.hidden ? 'visibility_off' : 'visibility' }}</mat-icon>
+              </button>
+
+              <button mat-icon-button color="warn" 
+                      (click)="deletePost(post.id)" 
+                      title="Delete Permanently">
+                <mat-icon>delete_forever</mat-icon>
+              </button>
+            </div>
+
+          </div>
+
+          <div class="empty-state" *ngIf="posts().length === 0">
+            <mat-icon>auto_awesome</mat-icon>
+            <p>Everything is clean! No posts to moderate.</p>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+</div>

@@ -68,9 +68,12 @@ public class AuthenticationController {
             user.getPassword())
     );
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-    String token = jwtUtils.generateToken(userDetails.getUsername());
+
+  User userInformations = userRepository.findByUsername(userDetails.getUsername());
+
+   // System.out.println(role+"ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
+    String token = jwtUtils.generateToken(userDetails.getUsername(),userInformations);
     Map<String,Object> response = new HashMap<>();
-    User userInformations = userRepository.findByUsername(userDetails.getUsername());
       //
     response.put("token",token);
     response.put("user",userInformations);

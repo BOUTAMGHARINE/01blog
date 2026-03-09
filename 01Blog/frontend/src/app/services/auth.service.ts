@@ -40,4 +40,8 @@ export class AuthService {
     
     return user ? user.id : null;
   }
+  getUserRole():String | null{
+    const user = this.currentUser();
+    return user ? user.role :null;
+  }
 }

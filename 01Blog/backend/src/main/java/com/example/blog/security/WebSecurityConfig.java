@@ -60,6 +60,7 @@ public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Excepti
         .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
             // 2. Autoriser explicitement les requêtes OPTIONS (Preflight)
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
             .requestMatchers(

@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.parameters.P;
@@ -18,6 +19,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.List;
+
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Component
 @Slf4j
@@ -49,22 +53,23 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
                                     System.out.println("JWT  "+jwt );
 
-            if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
-                                        System.out.println("JWT ============hhhhhhhhhhhhhhhhh==============-------------------=== " );
+          if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
 
-                final String username = jwtUtil.getUserFromToken(jwt);
-                final UserDetails userDetails =
-                        userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
-                SecurityContextHolder.getContext()
-                        .setAuthentication(authenticationToken);
-            }
+    final String username = jwtUtil.getUserFromToken(jwt);
+
+    // Extraire le rôle directement depuis le token
+    final String role = jwtUtil.getRoleFromToken(jwt); // à créer
+    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+
+    UsernamePasswordAuthenticationToken authenticationToken =
+            new UsernamePasswordAuthenticationToken(
+                    username, // tu peux mettre username ici, pas besoin de UserDetails
+                    null,
+                    authorities);
+
+    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+}
         } catch (Exception e) {
                                     System.out.println(e );
 

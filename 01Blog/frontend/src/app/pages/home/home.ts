@@ -1,7 +1,6 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal,computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-
 // Modules Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -54,6 +53,13 @@ export class HomeComponent implements OnInit {
     this.loadPosts();
     this.currentUserId = this.authService.getUserId();
   }
+
+  isAdmin = computed(() => {
+    const role = this.authService.getUserRole(); // Assure-toi que cette méthode existe dans ton AuthService
+    console.log("yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",role);
+    
+    return role === 'ROLE_ADMIN';
+  });
 
   loadPosts(): void {
     this.postService.getAllPosts().subscribe({

@@ -12,8 +12,15 @@ import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
+
 import lombok.extern.slf4j.Slf4j;
+
 import java.util.*; 
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.example.blog.entities.User;
 
 @Component
 @Slf4j
@@ -32,8 +39,11 @@ public class JwtUtils  {
      this.key =Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     } 
 
-    public String generateToken(String username){
-            return Jwts.builder()
+    public String generateToken(String username,User user){
+    
+
+        return Jwts.builder()
+        .claim("role", user.getRole()) 
         .setSubject(username)
         .setIssuedAt(new Date())
         .setExpiration(new Date(System.currentTimeMillis() + Jwtexpiration)) // 1 jour
@@ -41,7 +51,14 @@ public class JwtUtils  {
         .compact();
 
     }
-
+    public String getRoleFromToken(String token) {
+    return Jwts.parserBuilder()
+            .setSigningKey(key)
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("role", String.class);
+}
   
 
   public String getUserFromToken(String token) {

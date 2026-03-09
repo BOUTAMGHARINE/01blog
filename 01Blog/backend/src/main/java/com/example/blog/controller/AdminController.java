@@ -1,0 +1,72 @@
+package  com.example.blog.controller;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.blog.entities.Post;
+import  com.example.blog.repository.*;
+
+import com.example.blog.entities.User;
+
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/api/admin")
+@RequiredArgsConstructor
+public class AdminController {
+
+
+    private final UserRepository userRepository ;
+    private final PostRepository postRepository ;
+
+    // ---------------------------
+    // Utilisateurs
+    // ---------------------------
+
+    // Lister tous les utilisateurs
+    @GetMapping("/users")
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    // Supprimer un utilisateur
+    @DeleteMapping("/users/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("This user has been deleted");
+    }
+
+    // ---------------------------
+    // Posts
+    // ---------------------------
+
+    // Lister tous les posts
+    @GetMapping("/posts")
+    public List<Post> getAllPosts() {
+        return postRepository.findAll();
+    }
+
+    // Cacher un post (mettre hidden = true)
+    @PatchMapping("/posts/{id}/hide")
+    public ResponseEntity<String> hidePost(@PathVariable Long id) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Post not found"));
+        post.setHidden(true);
+        postRepository.save(post);
+        return ResponseEntity.ok("Post successfully hidden");
+    }
+
+    // Supprimer un post
+    @DeleteMapping("/posts/{id}")
+    public ResponseEntity<String> deletePost(@PathVariable Long id) {
+        postRepository.deleteById(id);
+        return ResponseEntity.ok("The post has been deleted");
+    }
+}
