@@ -20,10 +20,9 @@ export class AdminService {
     return this.http.get<any[]>(`${this.apiUrl}/posts`);
   }
 
-  hidePost(id: number): Observable<string> {
-    // Correspond à ton @PatchMapping("/posts/{id}/hide")
-    return this.http.patch(`${this.apiUrl}/posts/${id}/hide`, {}, { responseType: 'text' });
-  }
+ toggleHidePost(id: number): Observable<string> {
+  return this.http.patch(`${this.apiUrl}/posts/${id}/toggle-hide`, {}, { responseType: 'text' });
+}
 
   deletePost(id: number): Observable<string> {
     return this.http.delete(`${this.apiUrl}/posts/${id}`, { responseType: 'text' });

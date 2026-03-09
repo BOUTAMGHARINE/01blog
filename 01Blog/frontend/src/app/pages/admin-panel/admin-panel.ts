@@ -60,17 +60,17 @@ export class AdminPanelComponent implements OnInit {
     }
   }
 
-  onHidePost(postId: number) {
-    this.adminService.hidePost(postId).subscribe({
-      next: (response) => {
-        this.posts.update(allPosts => 
-          allPosts.map(p => p.id === postId ? { ...p, hidden: true } : p)
-        );
-        this.snackBar.open(response, 'OK', { duration: 3000 });
-      },
-      error: (err) => console.error("Erreur lors du masquage", err)
-    });
-  }
+  onToggleHide(post: any) {
+  this.adminService.toggleHidePost(post.id).subscribe({
+    next: (response) => {
+      this.posts.update(allPosts => 
+        allPosts.map(p => p.id === post.id ? { ...p, hidden: !p.hidden } : p)
+      );
+      this.snackBar.open(response, 'OK', { duration: 3000 });
+    },
+    error: (err) => console.error("Erreur toggle hide", err)
+  });
+}
 
   deletePost(postId: number) {
     if (confirm('Supprimer ce contenu définitivement ?')) {
