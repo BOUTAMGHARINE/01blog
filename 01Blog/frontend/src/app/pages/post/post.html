@@ -1,0 +1,64 @@
+<article class="post-card">
+  <header class="post-header">
+    <div class="user-info">
+      <div class="user-avatar"></div>
+      <div class="user-meta">
+        <span class="username">{{ post.author?.username || 'User' }}</span>
+        <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
+      </div>
+    </div>
+
+    <div class="post-options" *ngIf="post.author?.id === currentUserId || isAdmin">
+      <button mat-icon-button [matMenuTriggerFor]="postMenu">
+        <mat-icon>more_vert</mat-icon>
+      </button>
+      <mat-menu #postMenu="matMenu">
+        <button mat-menu-item (click)="post.isEditing = true" *ngIf="post.author?.id === currentUserId">
+          <mat-icon>edit</mat-icon>
+          <span>Modifier</span>
+        </button>
+        <button mat-menu-item (click)="onDeletePost(post.id)">
+          <mat-icon color="warn">delete</mat-icon>
+          <span>Supprimer</span>
+        </button>
+      </mat-menu>
+    </div>
+  </header>
+
+  <div class="post-content">
+    <p *ngIf="!post.isEditing">{{ post.content }}</p>
+
+    <div class="edit-mode-container" *ngIf="post.isEditing">
+      <textarea #editInput class="modern-textarea" [value]="post.content"></textarea>
+      <div class="edit-actions">
+        <button class="btn-cancel" (click)="post.isEditing = false">Annuler</button>
+        <button class="btn-save" (click)="updatePost(post, editInput.value)">Enregistrer</button>
+      </div>
+    </div>
+
+    <div class="post-media" *ngIf="post.mediaUrl && !post.isEditing">
+      <img [src]="post.mediaUrl" *ngIf="post.mediaType === 'IMAGE'">
+      <video controls width="100%" *ngIf="post.mediaType === 'VIDEO'">
+        <source [src]=" post.mediaUrl" type="video/mp4">
+      </video>
+    </div>
+  </div>
+
+  <div class="post-divider"></div>
+
+  <footer class="post-footer">
+    <button class="like-btn" [class.liked]="checkIfUserLiked(post)" (click)="toggleLike(post)">
+      <mat-icon>{{ checkIfUserLiked(post) ? 'favorite' : 'favorite_border' }}</mat-icon>
+      <span>{{ post.reactions?.length || 0 }} Likes</span>
+    </button>
+
+    <button class="comment-btn" (click)="post.showComments = !post.showComments">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      <span>{{ post.comments?.length || 0 }} Commentaires</span>
+    </button>
+  </footer>
+
+  <app-post-comments *ngIf="post.showComments" [postId]="post.id" [comments]="post.comments"
+    (commentAdded)="handleNewComment($event)">
+  </app-post-comments>
+</article>

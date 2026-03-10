@@ -3,7 +3,7 @@
     <div class="profile-cover"></div>
     <div class="profile-info-wrapper">
       <div class="avatar-container">
-        <img [src]="user()?.avatarUrl || 'assets/default-avatar.png'" alt="Avatar" class="profile-avatar">
+        <img [src]="user()?.avatarUrl ? 'http://localhost:8080/' + user()?.avatarUrl : 'assets/default-avatar.png'" alt="Avatar" class="profile-avatar">
       </div>
 
       <div class="user-details">
@@ -35,38 +35,13 @@
         </ng-template>
 
         <div class="posts-feed">
-          <mat-card *ngFor="let post of posts()" class="feed-card" [class.post-hidden]="post.hidden">
-
-            <mat-card-header>
-              <img mat-card-avatar [src]="user()?.avatarUrl || 'assets/default-avatar.png'" class="user-avatar-small">
-              <mat-card-title>@{{ user()?.username }}</mat-card-title>
-              <mat-card-subtitle>{{ post.createdAt | date:'medium' }}</mat-card-subtitle>
-
-              <span class="spacer"></span>
-
-              <div class="badge-hidden" *ngIf="post.hidden">
-                <mat-icon>visibility_off</mat-icon>
-                <span>Hidden by Admin</span>
-              </div>
-            </mat-card-header>
-
-            <div class="image-container" *ngIf="post.mediaUrl">
-              <img mat-card-image [src]="'http://localhost:8080/' + post.mediaUrl" *ngIf="post.mediaUrl"
-                alt="Post media" class="post-img">
-            </div>
-
-            <mat-card-content>
-              <p class="post-text">{{ post.content }}</p>
-            </mat-card-content>
-
-            <mat-divider></mat-divider>
-
-            <mat-card-actions align="end">
-              <button mat-button color="warn" (click)="onDeletePost(post.id)">
-                <mat-icon>delete_outline</mat-icon> Delete Post
-              </button>
-            </mat-card-actions>
-          </mat-card>
+          <app-post-item 
+            *ngFor="let post of posts()" 
+            [post]="post"
+            [currentUserId]="user()?.id"
+            [isAdmin]="user()?.role === 'ADMIN'"
+            (postDeleted)="onDeleteSuccess($event)">
+          </app-post-item>
 
           <div class="empty-state" *ngIf="posts().length === 0">
             <mat-icon>sentiment_dissatisfied</mat-icon>

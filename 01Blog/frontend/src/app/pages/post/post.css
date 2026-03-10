@@ -1,0 +1,236 @@
+/* Variables locales (au cas où elles ne seraient pas héritées du global) */
+:host {
+  --primary: #667eea;
+  --text-dark: #2d3436;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: block; /* Important pour les composants standalone */
+}
+
+/* Conteneur principal du Post */
+.post-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 25px;
+  border: 1px solid rgba(0,0,0,0.03);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+/* Header : Avatar + Username + Menu */
+.post-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background-color: #dfe6e9;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.user-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-weight: 700;
+  color: var(--text-dark);
+  font-size: 0.95rem;
+}
+
+.timestamp {
+  font-size: 0.75rem;
+  color: #b2bec3;
+}
+
+.post-options {
+  margin-left: auto;
+}
+
+/* Corps du Post */
+.post-content {
+  padding: 0 16px 16px;
+}
+
+.post-content p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #2d3436;
+  white-space: pre-wrap;
+}
+
+/* Médias (Images et Vidéos) */
+.post-media {
+  margin-top: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8fafc;
+}
+
+.post-media img, .post-media video {
+  width: 100%;
+  display: block;
+  object-fit: contain;
+  max-height: 500px;
+}
+
+/* Mode Édition */
+.edit-mode-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modern-textarea {
+  width: 100%;
+  border: 1px solid #e1e8ed;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+  outline: none;
+}
+
+.edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-save {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 6px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Footer : Like & Comment */
+.post-divider {
+  height: 1px;
+  background: #f1f5f9;
+  margin: 0 16px;
+}
+
+.post-footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 6px 12px;
+}
+
+.like-btn, .comment-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #636e72;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 10px 16px;
+  border-radius: 8px;
+  transition: all 0.2s;
+  flex: 1;
+  justify-content: center;
+}
+
+.like-btn:hover, .comment-btn:hover {
+  background-color: rgba(102, 126, 234, 0.08);
+  color: var(--primary);
+}
+
+.like-btn.liked {
+  color: #e74c3c;
+}
+
+.like-btn.liked:hover {
+  background-color: rgba(231, 76, 60, 0.08);
+}
+
+/* État caché (Admin) */
+.is-hidden-mode {
+  opacity: 0.7;
+  border-left: 4px solid #fab1a0;
+  background: #fffafa;
+}
+/* Le bouton de base */
+.like-btn {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #636e72;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* Quand le bouton a la classe .liked */
+.like-btn.liked {
+  color: #e74c3c !important; /* Force la couleur rouge */
+}
+
+/* Animation optionnelle pour le petit coeur */
+.like-btn.liked mat-icon {
+  transform: scale(1.2);
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.post-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  border: 1px solid rgba(0,0,0,0.03);
+}
+
+.post-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.user-info { display: flex; align-items: center; gap: 12px; }
+.user-avatar { width: 40px; height: 40px; background: #dfe6e9; border-radius: 50%; }
+
+.post-content { padding: 0 16px 16px; }
+.modern-textarea { width: 100%; border-radius: 8px; border: 1px solid #ddd; padding: 10px; }
+
+.post-footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 12px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.like-btn, .comment-btn {
+  background: none; border: none; display: flex; align-items: center; gap: 8px;
+  color: #636e72; font-weight: 600; cursor: pointer; padding: 8px; border-radius: 8px;
+}
+
+/* Style quand le post est liké */
+.like-btn.liked {
+  color: #e74c3c !important;
+}
+
+.like-btn.liked mat-icon {
+  animation: pulse 0.3s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
