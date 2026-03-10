@@ -34,7 +34,6 @@ public class Post {
     private LocalDateTime createdAt;
     private String mediaUrl; // image ou vidéo
     private String mediaType; // IMAGE ou VIDEO
-    @JsonIgnore
     private boolean hidden;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "author_id", nullable = true   , referencedColumnName = "id")

@@ -60,17 +60,18 @@ public class AdminController {
     }
 
     // Cacher un post (mettre hidden = true)
-   @PatchMapping("/posts/{id}/toggle-hide")
+@PatchMapping("/posts/{id}/toggle-hide")
 public ResponseEntity<String> toggleHidePost(@PathVariable Long id) {
     Post post = postRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Post non trouvé"));
+            .orElseThrow(() -> new RuntimeException("Post not found"));
     
-    // On inverse l'état : si c'est true ça devient false, et inversement
+    // Inverse the state
     boolean newStatus = !post.isHidden();
     post.setHidden(newStatus);
     postRepository.save(post);
     
-    String message = newStatus ? "Post caché" : "Post rendu visible";
+    // English messages
+    String message = newStatus ? "Post hidden successfully" : "Post is now visible";
     return ResponseEntity.ok(message);
 }
 

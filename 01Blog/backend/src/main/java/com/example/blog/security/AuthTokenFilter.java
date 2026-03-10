@@ -48,10 +48,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
                 
         try {
-                        System.out.println("JWT ==========================-------------------=== " );
 
             String jwt = parseJwt(request);
-                                    System.out.println("JWT  "+jwt );
 
           if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
 
@@ -71,29 +69,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 }
         } catch (Exception e) {
-                                    System.out.println(e );
 
-            System.out.println("Cannot set user authentication: {}");
         }
         filterChain.doFilter(request, response); // needed for the next filter in the chain
     }
 
     private String parseJwt(HttpServletRequest request) {
-          System.out.println("tytytttytyty" );
-                                System.out.println(request );
                                 // Remplace ton code de test par celui-ci temporairement :
 java.util.Enumeration<String> headerNames = request.getHeaderNames();
 while (headerNames.hasMoreElements()) {
     String name = headerNames.nextElement();
-    System.out.println("Header: " + name + " = " + request.getHeader(name));
 }
 
         String headerAuth = request.getHeader("authorization");//authorization
-        System.out.println(headerAuth);
         if (headerAuth != null && headerAuth.startsWith(BEARER_)) {
             return headerAuth.substring(BEARER_.length());
         }
-                                        System.out.println("JWT =================11111111111111111111=-------------------=== " );
 
         return null;
     }

@@ -1,0 +1,90 @@
+<div class="profile-container">
+  <header class="profile-header mat-elevation-z3">
+    <div class="profile-cover"></div>
+    <div class="profile-info-wrapper">
+      <div class="avatar-container">
+        <img [src]="user()?.avatarUrl || 'assets/default-avatar.png'" alt="Avatar" class="profile-avatar">
+      </div>
+
+      <div class="user-details">
+        <div class="name-row">
+          <h1>@{{ user()?.username }}</h1>
+          <span class="role-badge" [class.admin-role]="user()?.role === 'ADMIN'">
+            {{ user()?.role }}
+          </span>
+        </div>
+        <p class="user-email"><mat-icon>email</mat-icon> {{ user()?.email }}</p>
+        <p class="user-bio">{{ user()?.bio || 'No bio yet. Tell the world who you are!' }}</p>
+      </div>
+
+      <div class="profile-actions">
+        <button mat-flat-button color="primary" (click)="onEditProfile()">
+          <mat-icon>edit</mat-icon> Edit Profile
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="profile-content">
+    <mat-tab-group dynamicHeight centered color="primary">
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">article</mat-icon>
+          My Posts ({{ posts().length }})
+        </ng-template>
+
+        <div class="posts-feed">
+          <mat-card *ngFor="let post of posts()" class="feed-card" [class.post-hidden]="post.hidden">
+
+            <mat-card-header>
+              <img mat-card-avatar [src]="user()?.avatarUrl || 'assets/default-avatar.png'" class="user-avatar-small">
+              <mat-card-title>@{{ user()?.username }}</mat-card-title>
+              <mat-card-subtitle>{{ post.createdAt | date:'medium' }}</mat-card-subtitle>
+
+              <span class="spacer"></span>
+
+              <div class="badge-hidden" *ngIf="post.hidden">
+                <mat-icon>visibility_off</mat-icon>
+                <span>Hidden by Admin</span>
+              </div>
+            </mat-card-header>
+
+            <div class="image-container" *ngIf="post.mediaUrl">
+              <img mat-card-image [src]="'http://localhost:8080/' + post.mediaUrl" *ngIf="post.mediaUrl"
+                alt="Post media" class="post-img">
+            </div>
+
+            <mat-card-content>
+              <p class="post-text">{{ post.content }}</p>
+            </mat-card-content>
+
+            <mat-divider></mat-divider>
+
+            <mat-card-actions align="end">
+              <button mat-button color="warn" (click)="onDeletePost(post.id)">
+                <mat-icon>delete_outline</mat-icon> Delete Post
+              </button>
+            </mat-card-actions>
+          </mat-card>
+
+          <div class="empty-state" *ngIf="posts().length === 0">
+            <mat-icon>sentiment_dissatisfied</mat-icon>
+            <p>You haven't shared anything yet.</p>
+            <button mat-stroked-button color="primary" routerLink="/home">Create your first post</button>
+          </div>
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">settings</mat-icon> Settings
+        </ng-template>
+        <div class="settings-placeholder">
+          <p>Account settings and privacy options will appear here.</p>
+        </div>
+      </mat-tab>
+
+    </mat-tab-group>
+  </div>
+</div>

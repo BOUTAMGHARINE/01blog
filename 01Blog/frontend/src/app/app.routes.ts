@@ -3,6 +3,7 @@ import { HomeComponent } from './pages/home/home';
 import { LoginComponent} from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel';
+import { ProfileComponent } from './pages/profile/profile';
 
 export const routes: Routes = [
     {
@@ -22,6 +23,10 @@ export const routes: Routes = [
    {
     path:"admin",
     component:AdminPanelComponent,
+   },
+   {
+    path:"profile",
+    component:ProfileComponent
    }
    
 

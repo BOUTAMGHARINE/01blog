@@ -12,6 +12,7 @@ public interface PostRepository extends JpaRepository <Post,Long> {
 
     List<Post> findByHidden(boolean hidden);
     Optional<Post> findById(Long id);
+    List<Post> findByAuthorUsername(String username);
 
     
 
