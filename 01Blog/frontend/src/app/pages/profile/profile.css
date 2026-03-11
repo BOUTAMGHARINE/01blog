@@ -150,4 +150,10 @@
   margin-bottom: 16px;
 }
 
+.user-stats {
+  display: flex;
+  gap: 20px; /* Ajuste la valeur (20px, 30px...) selon l'espace voulu */
+  align-items: center;
+}
+
 .tab-icon { margin-right: 8px; }

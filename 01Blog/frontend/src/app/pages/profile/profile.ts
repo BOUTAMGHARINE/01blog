@@ -1,6 +1,6 @@
-import { Component, OnInit, signal, computed, inject } from '@angular/core';
+import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +12,8 @@ import { MatDividerModule } from '@angular/material/divider';
 // Services et Composants
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post';
-import { PostItemComponent } from '../post/post'; // 👈 Assure-toi que le chemin est correct
+import { PostItemComponent } from '../post/post';
+import { UserService } from '../../user/user';
 
 @Component({
   selector: 'app-profile',
@@ -25,73 +26,100 @@ import { PostItemComponent } from '../post/post'; // 👈 Assure-toi que le chem
     MatTabsModule,
     MatSnackBarModule,
     MatDividerModule,
-    PostItemComponent // 👈 Obligatoire pour utiliser <app-post-item>
+    PostItemComponent
   ],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css']
 })
 export class ProfileComponent implements OnInit {
-  // Injection des services
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
   private postService = inject(PostService);
+  private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
-  // Signals pour la réactivité
-  user = signal<any>(null);
+  // --- SIGNALS ---
+  user = signal<any>(null); // Le profil affiché à l'écran
   posts = signal<any[]>([]);
 
+  // --- COMPUTED ---
+  // Ce signal se met à jour TOUT SEUL dès que 'user' ou 'authService.currentUser' change.
+  isFollowingUser = computed(() => {
+    const targetId = this.user()?.id;
+    if (!targetId || targetId === this.authService.getUserId()) return false;
+    return this.authService.isFollowing(targetId);
+  });
+
   ngOnInit(): void {
-    this.loadUserData();
-    this.loadUserPosts();
-  }
-
-  /**
-   * Récupère les informations de l'utilisateur connecté
-   */
-  loadUserData(): void {
-    const userData = this.authService.currentUser(); // Ou une méthode similaire de ton AuthService
-    this.user.set(userData);
-  }
-
-  /**
-   * Récupère uniquement les posts de l'utilisateur
-   */
-  loadUserPosts(): void {
-    const userId = this.authService.getUserId();
-    if (userId) {
-      // Si tu as une méthode spécifique getUserPosts(userId), utilise-la.
-      // Sinon, on filtre tous les posts par l'ID de l'auteur.
-      this.postService.getAllPosts().subscribe({
-        next: (allPosts) => {
-          const userPosts = allPosts.filter((p: any) => p.author?.id === userId);
-          this.posts.set(userPosts);
-        },
-        error: (err) => console.error("Erreur chargement posts profil", err)
-      });
-    }
-  }
-
-  /**
-   * Action déclenchée quand un post est supprimé via le composant enfant
-   */
-  onDeleteSuccess(postId: number): void {
-    // Mise à jour du signal pour retirer le post de la liste
-    this.posts.update(currentPosts => 
-      currentPosts.filter(p => p.id !== postId)
-    );
-    
-    this.snackBar.open('Post supprimé avec succès', 'Fermer', {
-      duration: 3000,
-      panelClass: ['success-snackbar']
+    this.route.params.subscribe(params => {
+      const userIdFromUrl = params['id'];
+      if (userIdFromUrl) {
+        this.loadOtherUserProfile(Number(userIdFromUrl));
+      } else {
+        this.loadMyProfile();
+      }
     });
   }
 
-  /**
-   * Redirection ou logique pour l'édition du profil
-   */
+  loadMyProfile(): void {
+    const currentUser = this.authService.currentUser();
+    if (currentUser) {
+      this.user.set(currentUser);
+      this.loadUserPosts(currentUser.id);
+    }
+  }
+
+  loadOtherUserProfile(userId: number): void {
+    this.userService.getUserById(userId).subscribe({
+      next: (userData) => {
+        this.user.set(userData);
+        this.loadUserPosts(userId);
+      },
+      error: () => this.snackBar.open('Utilisateur introuvable', 'Fermer', { duration: 3000 })
+    });
+  }
+
+  loadUserPosts(userId: number): void {
+    this.postService.getAllPosts().subscribe({
+      next: (allPosts) => {
+        const userPosts = allPosts.filter((p: any) => p.author?.id === userId);
+        this.posts.set(userPosts);
+      },
+      error: (err) => console.error("Erreur chargement posts", err)
+    });
+  }
+
+  onToggleFollow(): void {
+    const targetUser = this.user();
+    const currentUserId = this.authService.getUserId();
+
+    if (!targetUser || !currentUserId) return;
+
+    this.authService.toggleFollow(targetUser.id).subscribe({
+      next: () => {
+        // 1. On rafraîchit le profil visité (pour le compteur followers)
+        this.userService.getUserById(targetUser.id).subscribe(updatedTarget => {
+          this.user.set(updatedTarget);
+        });
+
+        // 2. On rafraîchit l'utilisateur connecté (pour le bouton follow via computed)
+        // La méthode refreshCurrentUser doit être dans ton AuthService
+        this.authService.refreshCurrentUser();
+
+        this.snackBar.open("Mise à jour réussie", 'OK', { duration: 2000 });
+      },
+      error: (err) => {
+        console.error("Erreur toggle follow", err);
+        this.snackBar.open("Erreur de synchronisation", "OK");
+      }
+    });
+  }
+
+  onDeleteSuccess(postId: number): void {
+    this.posts.update(currentPosts => currentPosts.filter(p => p.id !== postId));
+  }
+
   onEditProfile(): void {
-    console.log("Édition du profil pour :", this.user()?.username);
-    // Ici, tu peux ouvrir un Dialog ou naviguer vers une page settings
-    this.snackBar.open('Fonctionnalité d\'édition bientôt disponible', 'OK');
+    this.snackBar.open('Édition bientôt disponible', 'OK', { duration: 2000 });
   }
 }

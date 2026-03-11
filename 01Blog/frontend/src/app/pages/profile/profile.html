@@ -3,7 +3,8 @@
     <div class="profile-cover"></div>
     <div class="profile-info-wrapper">
       <div class="avatar-container">
-        <img [src]="user()?.avatarUrl ? 'http://localhost:8080/' + user()?.avatarUrl : 'assets/default-avatar.png'" alt="Avatar" class="profile-avatar">
+        <img [src]="user()?.avatarUrl ? 'http://localhost:8080/' + user()?.avatarUrl : 'assets/default-avatar.png'"
+          alt="Avatar" class="profile-avatar">
       </div>
 
       <div class="user-details">
@@ -18,9 +19,23 @@
       </div>
 
       <div class="profile-actions">
-        <button mat-flat-button color="primary" (click)="onEditProfile()">
+        <button mat-flat-button color="primary" *ngIf="user()?.id === authService.getUserId()"
+          (click)="onEditProfile()">
           <mat-icon>edit</mat-icon> Edit Profile
         </button>
+
+        <button mat-stroked-button *ngIf="user()?.id !== authService.getUserId()"
+          [color]="isFollowingUser() ? 'warn' : 'primary'" (click)="onToggleFollow()">
+          <mat-icon>{{ isFollowingUser() ? 'person_remove' : 'person_add' }}</mat-icon>
+          {{ isFollowingUser() ? 'Unfollow' : 'Follow' }}
+        </button>
+
+
+      </div>
+
+      <div class="user-stats">
+        <span><strong>{{ user()?.followers?.length || 0 }}</strong> Followers</span>
+        <span><strong>{{ user()?.following?.length || 0 }}</strong> Following</span>
       </div>
     </div>
   </header>
@@ -35,12 +50,8 @@
         </ng-template>
 
         <div class="posts-feed">
-          <app-post-item 
-            *ngFor="let post of posts()" 
-            [post]="post"
-            [currentUserId]="user()?.id"
-            [isAdmin]="user()?.role === 'ADMIN'"
-            (postDeleted)="onDeleteSuccess($event)">
+          <app-post-item *ngFor="let post of posts()" [post]="post" [currentUserId]="user()?.id"
+            [isAdmin]="user()?.role === 'ADMIN'" (postDeleted)="onDeleteSuccess($event)">
           </app-post-item>
 
           <div class="empty-state" *ngIf="posts().length === 0">

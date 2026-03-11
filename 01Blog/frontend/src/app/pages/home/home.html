@@ -1,10 +1,26 @@
 <nav class="modern-nav">
   <div class="nav-content">
     <h1 class="brand-logo">01Blog</h1>
+    
     <div class="search-bar-container">
       <mat-icon>search</mat-icon>
-      <input type="text" placeholder="Search...">
+      <input type="text" 
+             placeholder="Search users..." 
+             (input)="searchQuery.set(searchBox.value)" 
+             #searchBox>
+      
+      <div class="search-results-dropdown" *ngIf="filteredUsers().length > 0">
+        <div class="search-item" *ngFor="let user of filteredUsers()" (click)="goToProfile(user.id)">
+          <div class="user-avatar-tiny">
+            <img [src]="user.avatarUrl ? 'http://localhost:8080/' + user.avatarUrl : 'assets/default-avatar.png'">
+          </div>
+          <div class="search-info">
+            <span class="username">@{{ user.username }}</span>
+          </div>
+        </div>
+      </div>
     </div>
+
     <div class="nav-links">
       <button mat-icon-button routerLink="/admin" *ngIf="isAdmin()" class="admin-btn">
         <mat-icon>admin_panel_settings</mat-icon>
@@ -29,8 +45,10 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput placeholder="What's on your mind?" (focus)="isExpanded.set(true)"
-            class="modern-textarea"></textarea>
+          <textarea #postInput 
+                    placeholder="What's on your mind?" 
+                    (focus)="isExpanded.set(true)"
+                    class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()">
@@ -51,18 +69,23 @@
         </div>
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-            (click)="onPublish(postInput)">Post</button>
+          <button mat-flat-button class="btn-post" 
+                  [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+                  (click)="onPublish(postInput)">Post</button>
         </div>
       </div>
     </section>
 
     <div class="posts-list">
       <div *ngIf="posts().length === 0" class="loading-state">
-        <p>Loading your feed...</p>
+        <p>No posts to show. Start following people!</p>
       </div>
 
-      <app-post-item *ngFor="let p of posts()" [post]="p" [currentUserId]="currentUserId" [isAdmin]="isAdmin()"
+      <app-post-item 
+        *ngFor="let p of posts()" 
+        [post]="p" 
+        [currentUserId]="currentUserId" 
+        [isAdmin]="isAdmin()"
         (postDeleted)="onDeleteSuccess($event)">
       </app-post-item>
     </div>

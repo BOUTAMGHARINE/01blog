@@ -44,4 +44,31 @@ export class AuthService {
     const user = this.currentUser();
     return user ? user.role :null;
   }
+  // Dans auth.service.ts
+toggleFollow(targetUserId: number): Observable<any> {
+  const currentUserId = this.getUserId();
+return this.http.post(`http://localhost:8080/api/users/${targetUserId}/follow?currentUserId=${currentUserId}`, {});}
+
+// Optionnel : Vérifier si on suit déjà quelqu'un
+isFollowing(targetUserId: number): boolean {
+  const user = this.currentUser();
+  if (!user || !user.following) return false;
+  
+  // Utilise == au lieu de === pour éviter les conflits Type String/Number
+  return user.following.some((u: any) => u.id == targetUserId);
+}
+
+// Dans auth.service.ts
+
+// Ajoute cette méthode pour synchroniser le signal avec le serveur
+refreshCurrentUser(): void {
+  const userId = this.getUserId();
+  if (userId) {
+    this.http.get(`http://localhost:8080/api/users/${userId}`).subscribe(updatedUser => {
+      this.currentUser.set(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser)); // Optionnel: garde le localstorage à jour
+    });
+  }
+}
+
 }
