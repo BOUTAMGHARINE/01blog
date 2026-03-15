@@ -2,11 +2,10 @@
   <header class="profile-header mat-elevation-z3">
     <div class="profile-cover"></div>
     <div class="profile-info-wrapper">
-      <div class="avatar-container">
-        <img [src]="user()?.avatarUrl ? 'http://localhost:8080/' + user()?.avatarUrl : 'assets/default-avatar.png'"
-          alt="Avatar" class="profile-avatar">
-      </div>
 
+      <div class="avatar-container">
+        <img src="http://localhost:8080/1773150835676_download.jpeg" alt="Avatar" class="profile-avatar">
+      </div>
       <div class="user-details">
         <div class="name-row">
           <h1>@{{ user()?.username }}</h1>
@@ -15,7 +14,6 @@
           </span>
         </div>
         <p class="user-email"><mat-icon>email</mat-icon> {{ user()?.email }}</p>
-        <p class="user-bio">{{ user()?.bio || 'No bio yet. Tell the world who you are!' }}</p>
       </div>
 
       <div class="profile-actions">
@@ -29,8 +27,6 @@
           <mat-icon>{{ isFollowingUser() ? 'person_remove' : 'person_add' }}</mat-icon>
           {{ isFollowingUser() ? 'Unfollow' : 'Follow' }}
         </button>
-
-
       </div>
 
       <div class="user-stats">
@@ -46,28 +42,46 @@
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">article</mat-icon>
-          My Posts ({{ posts().length }})
+          Posts ({{ posts().length }})
         </ng-template>
 
         <div class="posts-feed">
-          <app-post-item *ngFor="let post of posts()" [post]="post" [currentUserId]="user()?.id"
-            [isAdmin]="user()?.role === 'ADMIN'" (postDeleted)="onDeleteSuccess($event)">
+          <app-post-item *ngFor="let post of posts()" [post]="post" [currentUserId]="authService.getUserId()"
+            [isAdmin]="authService.getUserRole() === 'ADMIN'" (postDeleted)="onDeleteSuccess($event)">
           </app-post-item>
 
           <div class="empty-state" *ngIf="posts().length === 0">
             <mat-icon>sentiment_dissatisfied</mat-icon>
-            <p>You haven't shared anything yet.</p>
-            <button mat-stroked-button color="primary" routerLink="/home">Create your first post</button>
+            <p>No posts shared yet.</p>
+            <button mat-stroked-button color="primary" routerLink="/home"
+              *ngIf="user()?.id === authService.getUserId()">
+              Create your first post
+            </button>
           </div>
         </div>
       </mat-tab>
 
-      <mat-tab>
+      <mat-tab *ngIf="user()?.id === authService.getUserId()">
         <ng-template mat-tab-label>
           <mat-icon class="tab-icon">settings</mat-icon> Settings
         </ng-template>
-        <div class="settings-placeholder">
-          <p>Account settings and privacy options will appear here.</p>
+
+        <div class="settings-container">
+          <div class="settings-card mat-elevation-z1">
+            <h3>Account Settings</h3>
+            <p class="description">Manage your privacy and account preferences.</p>
+
+            <mat-divider></mat-divider>
+
+            <div class="settings-actions">
+              <button mat-button color="primary" (click)="openChangePasswordDialog()">
+                <mat-icon>lock</mat-icon> Change Password
+              </button>
+              <button mat-button color="warn">
+                <mat-icon>delete_forever</mat-icon> Deactivate Account
+              </button>
+            </div>
+          </div>
         </div>
       </mat-tab>
 

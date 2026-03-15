@@ -2,6 +2,9 @@ import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, ActivatedRoute } from '@angular/router';
 
+
+import { MatDialog } from '@angular/material/dialog';
+import { ChangePasswordDialog } from '../change-password-dialog/change-password-dialog';
 // Angular Material
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -37,7 +40,7 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
-
+private dialog = inject(MatDialog);
   // --- SIGNALS ---
   user = signal<any>(null); // Le profil affiché à l'écran
   posts = signal<any[]>([]);
@@ -122,4 +125,50 @@ export class ProfileComponent implements OnInit {
   onEditProfile(): void {
     this.snackBar.open('Édition bientôt disponible', 'OK', { duration: 2000 });
   }
-}
+
+  openChangePasswordDialog(): void {
+    const dialogRef = this.dialog.open(ChangePasswordDialog, {
+      width: '400px',
+      disableClose: true 
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        
+        // 'result' contient { oldPassword, newPassword }
+        console.log('Données reçues du dialogue:', result);
+       this.updateUserPassword(result);
+      }
+    });
+
+  }
+
+  updateUserPassword(passwords: any): void {
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      this.snackBar.open('Erreur : Utilisateur non identifié', 'OK');
+      return;
+    }
+
+    // On prépare l'objet à envoyer au serveur
+    const payload = {
+      userId: userId,
+      oldPassword: passwords.oldPassword,
+      newPassword: passwords.newPassword
+    };
+  
+
+    // On appelle le service (assure-toi que cette méthode existe dans ton UserService)
+    this.userService.updatePassword(payload).subscribe({
+      next: (response) => {
+        this.snackBar.open('Mot de passe mis à jour !', 'Fermer', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error('Erreur backend:', err);
+        this.snackBar.open('Ancien mot de passe incorrect', 'Fermer', { duration: 3000 });
+      }
+    });
+  }
+
+
+  }

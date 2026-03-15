@@ -37,4 +37,9 @@ export class UserService {
   searchUsers(query: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}/search?q=${query}`);
   }
+  updatePassword(data: any): Observable<any> {
+  console.log("pppppppppppppppppppppppppppppppppppppppppppppppppppppp");
+  
+  return this.http.post('http://localhost:8080/api/users/change-password', data);
+}
 }
