@@ -38,8 +38,12 @@ export class UserService {
     return this.http.get<any[]>(`${this.baseUrl}/search?q=${query}`);
   }
   updatePassword(data: any): Observable<any> {
-  console.log("pppppppppppppppppppppppppppppppppppppppppppppppppppppp");
   
   return this.http.post('http://localhost:8080/api/users/change-password', data);
+}
+
+deleteUser(id: number): Observable<any> {
+  // On utilise la méthode DELETE pour respecter les standards REST
+  return this.http.delete(`http://localhost:8080/api/users/${id}`);
 }
 }

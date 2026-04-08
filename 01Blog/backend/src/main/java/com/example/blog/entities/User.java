@@ -49,17 +49,18 @@ public class User {
     // --- Relations Auto-référencées (Follow System) ---
 
     // Les personnes que l'utilisateur suit
-    @ManyToMany
+    @ManyToMany(cascade=CascadeType.ALL)
     @JoinTable(
         name = "user_subscriptions",
         joinColumns = @JoinColumn(name = "follower_id"),
         inverseJoinColumns = @JoinColumn(name = "following_id")
+        
     )
     @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
     private Set<User> following = new HashSet<>();
 
     // Les personnes qui suivent l'utilisateur
-    @ManyToMany(mappedBy = "following")
+    @ManyToMany(mappedBy = "following",cascade=CascadeType.ALL)
     @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
     private Set<User> followers = new HashSet<>();
 

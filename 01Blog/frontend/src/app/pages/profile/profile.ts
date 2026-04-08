@@ -161,14 +161,42 @@ private dialog = inject(MatDialog);
     // On appelle le service (assure-toi que cette méthode existe dans ton UserService)
     this.userService.updatePassword(payload).subscribe({
       next: (response) => {
-        this.snackBar.open('Mot de passe mis à jour !', 'Fermer', { duration: 3000 });
+        this.snackBar.open('Password updated successfully!', 'Fermer', { duration: 3000 });
       },
       error: (err) => {
-        console.error('Erreur backend:', err);
-        this.snackBar.open('Ancien mot de passe incorrect', 'Fermer', { duration: 3000 });
+        console.log('Erreur backend:', err);
+    
+    // Récupère le message du backend ou utilise un message par défaut
+      const message = err.error?.message || 'Incorrect current password !!!';
+        this.snackBar.open(message, 'Fermer', { duration: 3000 });
       }
     });
   }
+
+
+
+  // Delete account 
+
+onDeactivateAccount(): void {
+  const confirmDeletion = confirm('Are you sure you want to deactivate your account? This action is permanent.');
+  
+  if (confirmDeletion) {
+    const userId = this.authService.getUserId();
+    if (!userId) return;
+
+    this.userService.deleteUser(userId).subscribe({
+      next: () => {
+        this.snackBar.open('Account deactivated successfully.', 'Close', { duration: 3000 });
+        // Déconnexion automatique après suppression
+       // this.authService.logout(); 
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error deactivating account.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+}
 
 
   }

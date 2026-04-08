@@ -2,6 +2,7 @@ package com.example.blog.entities;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,7 +32,7 @@ public class Reaction {
     @JoinColumn(name = "post_id", nullable = false  , referencedColumnName = "id")
     @JsonBackReference
     private Post post;
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="user_id",nullable = false ,referencedColumnName = "id") 
     private User user;
 }
