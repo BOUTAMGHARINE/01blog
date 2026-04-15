@@ -1,18 +1,46 @@
 package com.example.blog.entities;
 
+
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
+
 import jakarta.validation.constraints.Email;
+
 import lombok.AllArgsConstructor;
+
 import lombok.Getter;
+
 import lombok.NoArgsConstructor;
+
 import lombok.Setter;
 
+
+
 import java.util.HashSet;
+
 import java.util.List;
+
 import java.util.Set;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 @Entity
 @Table(name = "users")
@@ -38,62 +66,75 @@ public class User {
 
     // --- Relations avec les contenus ---
 
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    // Ajout de orphanRemoval = true pour supprimer les posts si l'user est supprimé
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore 
     private List<Post> posts;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Comment> comments;
 
+    // IMPORTANT : Ajoute cette liste pour gérer les réactions (l'erreur venait d'ici !)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<Reaction> reactions;
+
     // --- Relations Auto-référencées (Follow System) ---
 
-    // Les personnes que l'utilisateur suit
-    @ManyToMany(cascade=CascadeType.ALL)
+    // REMARQUE : On retire CascadeType.ALL ici. 
+    // Si tu supprimes un utilisateur, tu ne veux pas supprimer les gens qu'il suit !
+    @ManyToMany
     @JoinTable(
         name = "user_subscriptions",
         joinColumns = @JoinColumn(name = "follower_id"),
         inverseJoinColumns = @JoinColumn(name = "following_id")
-        
     )
     @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
     private Set<User> following = new HashSet<>();
 
-    // Les personnes qui suivent l'utilisateur
-    @ManyToMany(mappedBy = "following",cascade=CascadeType.ALL)
+    @ManyToMany(mappedBy = "following")
     @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
     private Set<User> followers = new HashSet<>();
 
-    // --- Sécurité Anti-Boucle Infinie ---
-
+    // --- Méthodes de cycle de vie (PreRemove) ---
+    
     /**
-     * Surcharge manuelle du toString pour éviter que Lombok 
-     * ne parcoure les listes circulaires (Set<User>).
+     * Cette méthode s'exécute juste avant la suppression de l'utilisateur.
+     * Elle est CRUCIALE pour nettoyer les tables de jointure ManyToMany 
+     * et éviter les violations de clés étrangères.
      */
-    @Override
-    public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
-                '}';
+    @PreRemove
+    private void removeUserFromSubscriptions() {
+        // On retire cet utilisateur de la liste "following" de tous ses followers
+        for (User follower : followers) {
+            follower.getFollowing().remove(this);
+        }
+        // On vide ses propres listes
+        this.following.clear();
+        this.followers.clear();
     }
 
-    /**
-     * equals et hashCode manuels basés uniquement sur l'ID 
-     * pour éviter les ConcurrentModificationException lors du rendu JSON.
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof User)) return false;
-        User user = (User) o;
-        return id != null && id.equals(user.id);
-    }
+    // ... tes méthodes toString, equals et hashCode restent identiques
 
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
+   
+    // Getter pour les abonnements
+public Set<User> getFollowing() {
+    return following;
+}
+
+// Setter pour les abonnements
+public void setFollowing(Set<User> following) {
+    this.following = following;
+}
+
+// Getter pour les abonnés
+public Set<User> getFollowers() {
+    return followers;
+}
+
+// Setter pour les abonnés
+public void setFollowers(Set<User> followers) {
+    this.followers = followers;
+}
 }

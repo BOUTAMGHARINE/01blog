@@ -47,6 +47,11 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.currentUserId = this.authService.getUserId();
+    if (this.currentUserId ==  null){
+      this.router.navigate(['login']);
+      return;
+      
+    }
     this.loadPosts();
     this.loadUsers();
   }
@@ -63,6 +68,13 @@ export class HomeComponent implements OnInit {
   isAdmin = computed(() => this.authService.getUserRole() === 'ROLE_ADMIN');
 
   loadPosts(): void {
+       if (this.currentUserId ==  null){
+      this.router.navigate(['login']);
+      return;
+      
+    }
+    console.log('---------------------------------------------',this.currentUserId);
+    
     this.postService.getAllPosts().subscribe({
       next: (data) => this.posts.set(data),
       error: (err) => console.error("Error loading posts", err)
@@ -112,4 +124,15 @@ export class HomeComponent implements OnInit {
     this.posts.update(list => list.filter(p => p.id !== postId));
     this.snackBar.open('Post supprimé', 'Fermer', { duration: 2000 });
   }
+
+  onLogout(): void {
+  // 1. Appel du logout (nettoyage localStorage/Session)
+  this.authService.logout();
+  
+  // 2. Notification optionnelle
+  this.snackBar.open('Logged out successfully', 'Close', { duration: 2000 });
+  
+  // 3. Redirection vers la page de login
+  this.router.navigate(['/login']);
+}
 }

@@ -32,7 +32,7 @@ public class Reaction {
     @JoinColumn(name = "post_id", nullable = false  , referencedColumnName = "id")
     @JsonBackReference
     private Post post;
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name="user_id",nullable = false ,referencedColumnName = "id") 
     private User user;
 }

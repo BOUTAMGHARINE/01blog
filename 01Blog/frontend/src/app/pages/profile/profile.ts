@@ -1,6 +1,6 @@
 import { Component, OnInit, signal, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute, Router } from '@angular/router';
 
 
 import { MatDialog } from '@angular/material/dialog';
@@ -40,7 +40,8 @@ export class ProfileComponent implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
-private dialog = inject(MatDialog);
+  private router = inject(Router);
+ private dialog = inject(MatDialog);
   // --- SIGNALS ---
   user = signal<any>(null); // Le profil affiché à l'écran
   posts = signal<any[]>([]);
@@ -187,6 +188,10 @@ onDeactivateAccount(): void {
     this.userService.deleteUser(userId).subscribe({
       next: () => {
         this.snackBar.open('Account deactivated successfully.', 'Close', { duration: 3000 });
+
+
+          this.router.navigate(['login']);
+
         // Déconnexion automatique après suppression
        // this.authService.logout(); 
       },

@@ -22,19 +22,26 @@
     </div>
 
     <div class="nav-links">
-      <button mat-icon-button routerLink="/admin" *ngIf="isAdmin()" class="admin-btn">
-        <mat-icon>admin_panel_settings</mat-icon>
-      </button>
-      <button mat-icon-button routerLink="/home" class="nav-btn active">
-        <mat-icon>home</mat-icon>
-      </button>
-      <button mat-icon-button class="nav-btn">
-        <mat-icon>notifications</mat-icon>
-      </button>
-      <button mat-icon-button routerLink="/profile" class="nav-btn">
-        <mat-icon>account_circle</mat-icon>
-      </button>
-    </div>
+  <button mat-icon-button routerLink="/admin" *ngIf="isAdmin()" class="admin-btn" title="Admin Panel">
+    <mat-icon>admin_panel_settings</mat-icon>
+  </button>
+
+  <button mat-icon-button routerLink="/home" class="nav-btn" routerLinkActive="active">
+    <mat-icon>home</mat-icon>
+  </button>
+
+  <button mat-icon-button class="nav-btn">
+    <mat-icon>notifications</mat-icon>
+  </button>
+
+  <button mat-icon-button routerLink="/profile" class="nav-btn" routerLinkActive="active">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onLogout()" class="nav-btn logout-btn" title="Logout">
+    <mat-icon>logout</mat-icon>
+  </button>
+</div>
   </div>
 </nav>
 

@@ -37,6 +37,10 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (localStorage.getItem('user') != null && localStorage.getItem('token') != null) {
+      this.router.navigate(['home']);
+      return;
+    }
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(40)]],
       password: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(45)]]

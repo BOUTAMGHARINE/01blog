@@ -71,6 +71,19 @@ refreshCurrentUser(): void {
   }
 }
 
+logout(): void {
+    // 1. Supprimer les données du stockage local
+    localStorage.removeItem('token'); 
+    // Si tu as un token spécifique : localStorage.removeItem('token');
+    localStorage.removeItem('user')
+
+    // 2. Réinitialiser le signal à null
+    this.currentUser.set(null);
+
+    // Note : La redirection vers /login se fera dans le composant 
+    // ou ici si tu injectes le Router dans le service.
+  }
+
 //change password
 
 
