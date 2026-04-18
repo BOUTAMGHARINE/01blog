@@ -1,14 +1,11 @@
 <nav class="modern-nav">
   <div class="nav-content">
     <h1 class="brand-logo">01Blog</h1>
-    
+
     <div class="search-bar-container">
       <mat-icon>search</mat-icon>
-      <input type="text" 
-             placeholder="Search users..." 
-             (input)="searchQuery.set(searchBox.value)" 
-             #searchBox>
-      
+      <input type="text" placeholder="Search users..." (input)="searchQuery.set(searchBox.value)" #searchBox>
+
       <div class="search-results-dropdown" *ngIf="filteredUsers().length > 0">
         <div class="search-item" *ngFor="let user of filteredUsers()" (click)="goToProfile(user.id)">
           <div class="user-avatar-tiny">
@@ -22,26 +19,41 @@
     </div>
 
     <div class="nav-links">
-  <button mat-icon-button routerLink="/admin" *ngIf="isAdmin()" class="admin-btn" title="Admin Panel">
-    <mat-icon>admin_panel_settings</mat-icon>
-  </button>
+      <button mat-icon-button routerLink="/admin" *ngIf="isAdmin()" class="admin-btn" title="Admin Panel">
+        <mat-icon>admin_panel_settings</mat-icon>
+      </button>
 
-  <button mat-icon-button routerLink="/home" class="nav-btn" routerLinkActive="active">
-    <mat-icon>home</mat-icon>
-  </button>
+      <button mat-icon-button routerLink="/home" class="nav-btn" routerLinkActive="active">
+        <mat-icon>home</mat-icon>
+      </button>
 
-  <button mat-icon-button class="nav-btn">
-    <mat-icon>notifications</mat-icon>
-  </button>
+      <button mat-icon-button class="nav-btn" [matMenuTriggerFor]="notifMenu" (menuOpened)="onMenuOpened()"> <mat-icon
+          [matBadge]="unreadCount()" matBadgeColor="warn" [matBadgeHidden]="unreadCount() === 0">
+          notifications
+        </mat-icon>
+      </button>
 
-  <button mat-icon-button routerLink="/profile" class="nav-btn" routerLinkActive="active">
-    <mat-icon>account_circle</mat-icon>
-  </button>
+      <mat-menu #notifMenu="matMenu" class="notification-menu">
+        <div class="notif-header">Notifications</div>
+        <button mat-menu-item *ngFor="let n of notifications()" (click)="goToPost(n.postId)">
+          <div class="notif-item">
+            <p>{{ n.message }}</p>
+            <small>{{ n.createdAt | date:'short' }}</small>
+          </div>
+        </button>
+        <div *ngIf="notifications().length === 0" class="empty-notif">
+          No new notifications.
+        </div>
+      </mat-menu>
 
-  <button mat-icon-button (click)="onLogout()" class="nav-btn logout-btn" title="Logout">
-    <mat-icon>logout</mat-icon>
-  </button>
-</div>
+      <button mat-icon-button routerLink="/profile" class="nav-btn" routerLinkActive="active">
+        <mat-icon>account_circle</mat-icon>
+      </button>
+
+      <button mat-icon-button (click)="onLogout()" class="nav-btn logout-btn" title="Logout">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
   </div>
 </nav>
 
@@ -52,10 +64,8 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput 
-                    placeholder="What's on your mind?" 
-                    (focus)="isExpanded.set(true)"
-                    class="modern-textarea"></textarea>
+          <textarea #postInput placeholder="What's on your mind?" (focus)="isExpanded.set(true)"
+            class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
             <button class="close-preview" (click)="removeMedia()">
@@ -76,9 +86,8 @@
         </div>
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button class="btn-post" 
-                  [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-                  (click)="onPublish(postInput)">Post</button>
+          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
+            (click)="onPublish(postInput)">Post</button>
         </div>
       </div>
     </section>
@@ -88,11 +97,7 @@
         <p>No posts to show. Start following people!</p>
       </div>
 
-      <app-post-item 
-        *ngFor="let p of posts()" 
-        [post]="p" 
-        [currentUserId]="currentUserId" 
-        [isAdmin]="isAdmin()"
+      <app-post-item *ngFor="let p of posts()" [post]="p" [currentUserId]="currentUserId" [isAdmin]="isAdmin()"
         (postDeleted)="onDeleteSuccess($event)">
       </app-post-item>
     </div>

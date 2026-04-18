@@ -4,16 +4,18 @@ import { Router, RouterLink } from '@angular/router'; // Ajout de Router
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-
+import { MatMenuModule } from '@angular/material/menu';   // <--- AJOUTE CECI
+import { MatBadgeModule } from '@angular/material/badge'; // <--- AJOUTE CECI
 import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post';
 import { PostItemComponent } from '../post/post';
 import { UserService } from '../../user/user';
+import { NotificationService } from '../../services/notification/notification';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, MatButtonModule, MatIconModule, MatSnackBarModule, PostItemComponent],
+  imports: [CommonModule, RouterLink, MatButtonModule, MatIconModule, MatSnackBarModule, PostItemComponent,MatMenuModule,MatBadgeModule],
   templateUrl: './home.html',
   styleUrls: ['./home.css']
 })
@@ -23,13 +25,59 @@ export class HomeComponent implements OnInit {
   private userService = inject(UserService);
   private snackBar = inject(MatSnackBar);
   private router = inject(Router);
-
+  private notificationService = inject(NotificationService);
   posts = signal<any[]>([]);
   isExpanded = signal<boolean>(false);
+  notifications = signal<any[]>([]);
   
   // Logic Recherche
   searchQuery = signal<string>('');
   allUsers = signal<any[]>([]); // Liste chargée au init
+
+  // 3. Propriété calculée pour le badge (matBadge)
+  unreadCount = computed(() => 
+    this.notifications().filter(n => !n.isRead).length
+  );
+
+
+  loadNotifications(userId: number): void {
+    console.log(this.notifications());
+    this.notificationService.getNotifications(userId).subscribe({
+      
+      next: (data : any) => this.notifications.set(data),
+      error: (err : any) => console.error('Error:', err)
+    });
+  }
+
+
+  // Fonction appelée quand on ouvre le menu
+onMenuOpened(): void {
+  const userId = this.authService.getUserId();
+  
+  if (userId && this.unreadCount() > 0) {
+    // ÉTAPE A : Mise à jour LOCALE (pour l'UI immédiate)
+    // On crée une nouvelle liste où TOUTES les notifications passent à isRead = true
+    this.notifications.update(currentNotifs => 
+      currentNotifs.map(n => ({
+        ...n, 
+        isRead: true // Vérifie bien que c'est 'isRead' et pas 'read'
+      }))
+    );
+
+    // ÉTAPE B : Mise à jour SERVEUR (pour que ça reste à 0 après refresh)
+    this.notificationService.markAllAsRead(userId).subscribe();
+  }
+}
+
+
+
+  // 5. Gérer le clic sur une notification
+  goToPost(postId: number): void {
+    if (postId) {
+      this.router.navigate(['/post', postId]);
+      // Optionnel : marquer comme lu ici
+    }
+  }
   
   // Signal calculé pour filtrer les utilisateurs en direct
   filteredUsers = computed(() => {
@@ -52,6 +100,7 @@ export class HomeComponent implements OnInit {
       return;
       
     }
+      this.loadNotifications(this.currentUserId);
     this.loadPosts();
     this.loadUsers();
   }

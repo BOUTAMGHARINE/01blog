@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+
 import org.apache.tika.Tika;
 
 
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.blog.dto.PostRequestDTO;
+import com.example.blog.entities.Notification;
 import com.example.blog.entities.Post;
 import com.example.blog.entities.User;
+import com.example.blog.repository.NotificationRepository;
 import com.example.blog.repository.PostRepository;
 import com.example.blog.repository.UserRepository;
 
@@ -28,6 +31,8 @@ public class PostService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+ private NotificationRepository notificationRepository; //
 
     private final String UPLOAD_DIR = "uploads";
 
@@ -78,7 +83,24 @@ public class PostService {
         // 5. On stocke UNIQUEMENT le nom du fichier en base de données
         post.setMediaUrl(fileName);
     }
+    Post savedPost = postRepository.save(post);
 
-    return postRepository.save(post);
+    // 2. LOGIQUE DES NOTIFICATIONS
+    // On parcourt la liste des followers de l'auteur
+    if (author.getFollowers() != null) {
+        for (User follower : author.getFollowers()) {
+            Notification notification = new Notification();
+            notification.setRecipient(follower);
+            notification.setPostId(savedPost.getId());
+            notification.setCreatedAt(LocalDateTime.now());
+            // Message en anglais comme demandé précédemment
+            notification.setMessage(author.getUsername() + " published a new post");
+            
+            notificationRepository.save(notification);
+        }
+    }
+
+    return savedPost;
+
 }
 }
