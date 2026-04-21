@@ -74,6 +74,7 @@ onMenuOpened(): void {
   // 5. Gérer le clic sur une notification
   goToPost(postId: number): void {
     if (postId) {
+      console.log("Navigating to post ID:", postId);
       this.router.navigate(['/post', postId]);
       // Optionnel : marquer comme lu ici
     }

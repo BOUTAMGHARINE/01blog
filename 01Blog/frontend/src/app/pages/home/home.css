@@ -276,4 +276,24 @@
   background: #e2e8f0;
 }
 
+/* Style du bouton lorsqu'il est activé */
+.btn-post {
+  background-color: #1976d2 !important; /* Bleu Angular par défaut ou ta couleur */
+  color: white !important;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+/* Style du bouton lorsqu'il est désactivé */
+.btn-post:disabled {
+  background-color: #e0e0e0 !important; /* Gris clair */
+  color: #9e9e9e !important; /* Texte gris foncé */
+  cursor: not-allowed;
+}
+
+/* Optionnel : Effet au survol quand il est actif */
+.btn-post:not(:disabled):hover {
+  background-color: #1565c0 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 .user-avatar-tiny img { width: 100%; height: 100%; object-fit: cover; }

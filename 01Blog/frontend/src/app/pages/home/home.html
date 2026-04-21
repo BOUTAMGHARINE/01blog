@@ -64,7 +64,7 @@
       <div class="composer-body">
         <div class="user-avatar-small"></div>
         <div class="input-wrapper">
-          <textarea #postInput placeholder="What's on your mind?" (focus)="isExpanded.set(true)"
+          <textarea #postInput placeholder="What's on your mind?" (input)="0" (focus)="isExpanded.set(true)"
             class="modern-textarea"></textarea>
 
           <div class="media-preview" *ngIf="selectedMediaUrl">
@@ -86,8 +86,10 @@
         </div>
         <div class="footer-actions">
           <button class="btn-cancel" (click)="cancelPost(postInput)">Cancel</button>
-          <button mat-flat-button class="btn-post" [disabled]="!postInput.value.trim() && !selectedMediaUrl"
-            (click)="onPublish(postInput)">Post</button>
+          <button mat-flat-button color="primary" class="btn-post"
+            [disabled]="!postInput.value.trim() && !selectedMediaUrl" (click)="onPublish(postInput)">
+            Post
+          </button>
         </div>
       </div>
     </section>
