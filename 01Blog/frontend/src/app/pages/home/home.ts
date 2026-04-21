@@ -36,18 +36,19 @@ export class HomeComponent implements OnInit {
 
   // 3. Propriété calculée pour le badge (matBadge)
   unreadCount = computed(() => 
-    this.notifications().filter(n => !n.isRead).length
+    this.notifications().filter(n => !n.read).length
   );
 
 
   loadNotifications(userId: number): void {
-    console.log(this.notifications());
-    this.notificationService.getNotifications(userId).subscribe({
-      
-      next: (data : any) => this.notifications.set(data),
-      error: (err : any) => console.error('Error:', err)
-    });
-  }
+  this.notificationService.getNotifications(userId).subscribe({
+    next: (data : any) => {
+      console.log('Format reçu du serveur :', data[0]); // <--- REGARDE ICI
+      this.notifications.set(data);
+    },
+    error: (err : any) => console.error('Error:', err)
+  });
+}
 
 
   // Fonction appelée quand on ouvre le menu
@@ -55,16 +56,15 @@ onMenuOpened(): void {
   const userId = this.authService.getUserId();
   
   if (userId && this.unreadCount() > 0) {
-    // ÉTAPE A : Mise à jour LOCALE (pour l'UI immédiate)
-    // On crée une nouvelle liste où TOUTES les notifications passent à isRead = true
+    // Mise à jour LOCALE
     this.notifications.update(currentNotifs => 
       currentNotifs.map(n => ({
         ...n, 
-        isRead: true // Vérifie bien que c'est 'isRead' et pas 'read'
+        read: true // On utilise 'read' ici au lieu de 'isRead'
       }))
     );
 
-    // ÉTAPE B : Mise à jour SERVEUR (pour que ça reste à 0 après refresh)
+    // Mise à jour SERVEUR
     this.notificationService.markAllAsRead(userId).subscribe();
   }
 }
