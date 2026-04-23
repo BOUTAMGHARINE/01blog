@@ -1,6 +1,11 @@
 package com.example.blog.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,31 +15,25 @@ import com.example.blog.entities.*;
 import com.example.blog.repository.ReportRepository;
 import com.example.blog.dto.ReportDto;
 
+
+
 @RestController
-@RequestMapping("/api")
-
-
+@RequestMapping("/api/reports")
 public class ReportController {
-
+    
     @Autowired
     private ReportRepository reportRepository;
-    // @Autowired
-    // private Report report;
 
-   @PostMapping("/newReport")
-    public Report savereport(@RequestBody ReportDto dto){
-      Report report = new Report();
-      report.setReporter_id(dto.getReporterId());
-      report.setReason(dto.getReason());
-      report.setReported_id(dto.getReportedId());
-        
-        reportRepository.save(report);
-        return report;
+    // Tout le monde peut envoyer un rapport
+    @PostMapping
+    public ResponseEntity<Report> createReport(@RequestBody Report report) {
+        return ResponseEntity.ok(reportRepository.save(report));
     }
 
-/*   private Long reporterId;
-    private String reason;
-    private Long reportedId; */
-
-
-}
+   // Seul l'admin peut voir la liste
+    @GetMapping
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<Report> getAllReports() {
+        return reportRepository.findAllByOrderByTimestampDesc();
+    }
+ }

@@ -9,7 +9,10 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 import java.time.*;
+
+import jakarta.persistence.Column;
 
 @Entity
 @AllArgsConstructor @NoArgsConstructor @Data
@@ -17,20 +20,19 @@ import java.time.*;
 
 @Table(name = "reports")
 public class Report {
-  @Id
-@GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id ;
-    private Long reporter_id;
-    private String reason;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private  Long reported_id ;
-    private LocalDateTime createdAt;
-
-     @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
+    private Long reportedProfileId; // L'ID de l'utilisateur signalé
+    private Long reporterId;        // L'ID de celui qui signale
+    
+    @Column(nullable = false)
+    private String reason;          // Motif du signalement
+    
+    private LocalDateTime timestamp = LocalDateTime.now();
+    
+    private boolean processed = false; // Pour que l'admin puisse marquer comme "traité"
 }
 /*
 @Entity

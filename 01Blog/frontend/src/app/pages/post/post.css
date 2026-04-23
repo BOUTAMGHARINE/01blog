@@ -234,3 +234,31 @@
   50% { transform: scale(1.2); }
   100% { transform: scale(1); }
 }
+
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Style pour l'item du menu de signalement */
+.mat-mdc-menu-item.report-item {
+    color: #d32f2f !important; /* Rouge standard Material */
+    transition: background-color 0.2s ease;
+}
+
+.mat-mdc-menu-item.report-item mat-icon {
+    color: #d32f2f !important;
+    margin-right: 8px;
+}
+
+/* Effet au survol spécifique pour le signalement */
+.mat-mdc-menu-item.report-item:hover {
+    background-color: rgba(211, 47, 47, 0.08) !important; /* Rouge très clair */
+}
+
+/* Texte en gras pour attirer l'attention */
+.mat-mdc-menu-item.report-item span {
+    font-weight: 500;
+}

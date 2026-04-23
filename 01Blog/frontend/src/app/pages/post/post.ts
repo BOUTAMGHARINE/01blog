@@ -6,7 +6,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { PostService } from '../../services/post';
 import { ReactionService } from '../../services/reaction';
 import { PostCommentsComponent } from '../post-comments/post-comments';
-
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importe le service et le module
+import { ReportService } from '../../services/report/report';
 @Component({
   selector: 'app-post-item',
   standalone: true,
@@ -22,7 +23,9 @@ import { PostCommentsComponent } from '../post-comments/post-comments';
 })
 export class PostItemComponent {
   private postService = inject(PostService);
+  private snackBar = inject(MatSnackBar);
   private reactionService = inject(ReactionService);
+  private reportService = inject(ReportService)
   private cdr = inject(ChangeDetectorRef);
 
   @Input({ required: true }) post: any;
@@ -72,4 +75,30 @@ export class PostItemComponent {
       });
     }
   }
+
+  /****************************************************Report**********************************************************/
+
+ openReportDialog(author: any): void {
+  const reason = prompt(`Reason for reporting ${author.username}:`);
+  
+  if (reason && reason.trim()) {
+    const report = {
+      reportedProfileId: author.id,
+      reporterId: this.currentUserId, // Assure-toi d'avoir récupéré l'ID de l'utilisateur courant
+      reason: reason,
+      timestamp: new Date()
+    };
+
+    this.reportService.sendReport(report).subscribe({
+      next: () => {
+        // Maintenant, cette ligne fonctionnera parfaitement !
+        this.snackBar.open('Report sent to administrators', 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error('Failed to send report', err);
+        this.snackBar.open('Error sending report', 'Close', { duration: 3000 });
+      }
+    });
+  }
+}
 }

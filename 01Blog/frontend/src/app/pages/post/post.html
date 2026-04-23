@@ -1,12 +1,18 @@
 <article class="post-card">
   <header class="post-header">
     <div class="user-info">
-      <div class="user-avatar"></div>
+      <div class="user-avatar">
+        <img src="http://localhost:8080/1772029097263_images.jpeg" alt="Avatar" class="avatar-img">
+      </div>
       <div class="user-meta">
         <span class="username">{{ post.author?.username || 'User' }}</span>
         <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
       </div>
     </div>
+      <button mat-menu-item class="report-item" (click)="openReportDialog(post.author)">
+  <mat-icon>report</mat-icon>
+  <span>Report Profile</span>
+</button>
 
     <div class="post-options" *ngIf="post.author?.id === currentUserId || isAdmin">
       <button mat-icon-button [matMenuTriggerFor]="postMenu">
@@ -21,6 +27,7 @@
           <mat-icon color="warn">delete</mat-icon>
           <span>Supprimer</span>
         </button>
+     
       </mat-menu>
     </div>
   </header>
