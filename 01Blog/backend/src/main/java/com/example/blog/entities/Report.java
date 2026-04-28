@@ -15,7 +15,7 @@ import java.time.*;
 import jakarta.persistence.Column;
 
 @Entity
-@AllArgsConstructor @NoArgsConstructor @Data
+@Data
 
 
 @Table(name = "reports")
@@ -27,12 +27,12 @@ public class Report {
     private Long reportedProfileId; // L'ID de l'utilisateur signalé
     private Long reporterId;        // L'ID de celui qui signale
     
-    @Column(nullable = false)
+    @Column
     private String reason;          // Motif du signalement
     
     private LocalDateTime timestamp = LocalDateTime.now();
     
-    private boolean processed = false; // Pour que l'admin puisse marquer comme "traité"
+   // private boolean processed = false; // Pour que l'admin puisse marquer comme "traité"
 }
 /*
 @Entity

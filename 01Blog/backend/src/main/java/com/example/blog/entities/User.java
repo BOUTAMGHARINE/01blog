@@ -12,21 +12,13 @@ import jakarta.persistence.*;
 
 import jakarta.validation.constraints.Email;
 
-import lombok.AllArgsConstructor;
-
-import lombok.Getter;
-
-import lombok.NoArgsConstructor;
-
-import lombok.Setter;
-
-
-
 import java.util.HashSet;
 
 import java.util.List;
 
 import java.util.Set;
+
+import lombok.Data;
 
 
 
@@ -44,26 +36,26 @@ import java.util.Set;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    
     private String username;
-
+    
     @Email(message = "Invalid email format")
     private String email;
-
+    
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-
+    
     private String role;
-
+    
+    @Column(nullable=false)
+        boolean  isBlocked = false;
+    
     // --- Relations avec les contenus ---
 
     // Ajout de orphanRemoval = true pour supprimer les posts si l'user est supprimé
@@ -137,4 +129,14 @@ public Set<User> getFollowers() {
 public void setFollowers(Set<User> followers) {
     this.followers = followers;
 }
+// public  boolean  getIsBlocked(){
+//     return  isBlocked;
+// }
+// public void  setIsLocked() {
+//     this.isBlocked =  true;
+// }
+
+    public boolean getIsBlocked() {
+        return  this.isBlocked;
+    }
 }

@@ -19,9 +19,13 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import static java.lang.Math.log;
 import java.util.List;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import com.example.blog.entities.User;
+import com.example.blog.repository.UserRepository;
 
 @Component
 @Slf4j
@@ -30,9 +34,15 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     public static final String BEARER_ = "Bearer ";
     @Autowired
     private JwtUtils jwtUtil;
-
-    @Autowired
+@Autowired
     private CustomUserDetailsService userDetailsService;
+    // @Autowired
+    @Autowired
+    private UserRepository userRepository;
+
+
+//  @Autowired
+//  private CustomUserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -46,14 +56,26 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
 
-                
         try {
+    String jwt = parseJwt(request);
 
-            String jwt = parseJwt(request);
+    if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
+        final String username = jwtUtil.getUserFromToken(jwt);
+        
+        // On charge l'objet User de Spring
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-          if (jwt != null && jwtUtil.validateJwtToken(jwt)) {
+        // Spring vérifie automatiquement la valeur de accountNonLocked
+        if (!userDetails.isAccountNonLocked()) {
+            System.out.println("Tentative de connexion sur un compte bloqué : {}"+ username);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"message\": \"Your account is blocked\"}");
+            return;
+        }
 
-    final String username = jwtUtil.getUserFromToken(jwt);
+//System.out.println(username+ "nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn");
+
 
     // Extraire le rôle directement depuis le token
     final String role = jwtUtil.getRoleFromToken(jwt); // à créer

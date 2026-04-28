@@ -9,27 +9,32 @@
         <span class="timestamp">{{ post.createdAt | date:'short' }}</span>
       </div>
     </div>
-      <button mat-menu-item class="report-item" (click)="openReportDialog(post.author)">
-  <mat-icon>report</mat-icon>
-  <span>Report Profile</span>
-</button>
+ 
 
-    <div class="post-options" *ngIf="post.author?.id === currentUserId || isAdmin">
-      <button mat-icon-button [matMenuTriggerFor]="postMenu">
-        <mat-icon>more_vert</mat-icon>
-      </button>
-      <mat-menu #postMenu="matMenu">
-        <button mat-menu-item (click)="post.isEditing = true" *ngIf="post.author?.id === currentUserId">
-          <mat-icon>edit</mat-icon>
-          <span>Modifier</span>
-        </button>
-        <button mat-menu-item (click)="onDeletePost(post.id)">
-          <mat-icon color="warn">delete</mat-icon>
-          <span>Supprimer</span>
-        </button>
-     
-      </mat-menu>
-    </div>
+<div class="post-options">
+  <button mat-icon-button [matMenuTriggerFor]="postMenu">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+
+  <mat-menu #postMenu="matMenu">
+    <button mat-menu-item (click)="post.isEditing = true" *ngIf="post.author?.id === currentUserId">
+      <mat-icon>edit</mat-icon>
+      <span>Modifier</span>
+    </button>
+
+    <button mat-menu-item (click)="onDeletePost(post.id)" *ngIf="post.author?.id === currentUserId || isAdmin">
+      <mat-icon color="warn">delete</mat-icon>
+      <span>Supprimer</span>
+    </button>
+
+    <button mat-menu-item class="report-item" 
+            (click)="openReportDialog(post.author)" 
+            *ngIf="post.author?.id !== currentUserId">
+      <mat-icon>report</mat-icon>
+      <span>Report Profile</span>
+    </button>
+  </mat-menu>
+</div>
   </header>
 
   <div class="post-content">

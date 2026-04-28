@@ -13,12 +13,14 @@ public class CustomUserDetails implements UserDetails {
     private String username;
     private String role;
     private String password;
+    private  boolean  islocked;
 
     public CustomUserDetails(User user) {
         this.id = user.getId();
         this.username = user.getUsername();
         this.role = user.getRole();
         this.password = user.getPassword();
+        this.islocked = user.getIsBlocked();
     }
 
     public Long getId() { return id; }
@@ -30,8 +32,17 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() { return password; }
+    
+    public void  setIslocked( boolean value){
+        this.islocked =value;
+    }
 
     // autres méthodes obligatoires...
+    
+    @Override
+    public boolean isAccountNonLocked() { 
+        return !islocked;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -20,7 +20,9 @@ import com.example.blog.dto.SignupRequest;
 import com.example.blog.entities.User;
 import com.example.blog.repository.UserRepository;
 import com.example.blog.security.JwtUtils;
+import com.example.blog.service.CustomUserDetailsService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
@@ -32,6 +34,9 @@ public class AuthenticationController {
     private UserRepository userRepository;
     private PasswordEncoder encoder;
     private JwtUtils jwtUtils;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
 
     @Autowired
     public AuthenticationController(
@@ -62,6 +67,20 @@ public class AuthenticationController {
     // }
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody User  user) {
+          //  System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
+            UserDetails userDetailss = userDetailsService.loadUserByUsername(user.getUsername());
+                System.out.println(".(------------------------------)"+!userDetailss.isAccountNonLocked());
+
+          
+                      if (!userDetailss.isAccountNonLocked()) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body("User is blocked");
+    }
+
+
+    System.out.println(".(------------------------------)"+!userDetailss.isAccountNonLocked());
     Authentication authentication = authenticationManager.authenticate(
         new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
             user.getUsername(),
