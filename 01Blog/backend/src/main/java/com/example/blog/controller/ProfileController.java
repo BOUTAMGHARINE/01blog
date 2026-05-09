@@ -13,8 +13,10 @@ import java.security.Principal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import com.example.blog.dto.UserResponseDto;
 import com.example.blog.entities.Post;
 import com.example.blog.repository.PostRepository;
 
@@ -31,7 +33,8 @@ public class ProfileController {
     // 1. Récupérer les infos de l'utilisateur connecté
 
 @GetMapping("/me")
-public ResponseEntity<User> getMyProfile(Principal principal) {
+@Transactional(readOnly = true)
+public ResponseEntity<UserResponseDto> getMyProfile(Principal principal) {
     if (principal == null) {
         return ResponseEntity.status(401).build();
     }
@@ -40,8 +43,7 @@ public ResponseEntity<User> getMyProfile(Principal principal) {
     User user = userRepository.findByUsername(principal.getName());
            
             
-    user.setPassword(null);
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(UserResponseDto.from(user));
 }
 
     // 2. Mettre à jour le profil (Bio, Email, etc.)

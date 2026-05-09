@@ -17,6 +17,7 @@ import { AuthService } from '../../services/auth.service';
 import { PostService } from '../../services/post';
 import { PostItemComponent } from '../post/post';
 import { UserService } from '../../user/user';
+import { ReportService } from '../../services/report/report';
 
 @Component({
   selector: 'app-profile',
@@ -41,7 +42,8 @@ export class ProfileComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
- private dialog = inject(MatDialog);
+  private dialog = inject(MatDialog);
+  private reportService = inject(ReportService);
   // --- SIGNALS ---
   user = signal<any>(null); // Le profil affiché à l'écran
   posts = signal<any[]>([]);
@@ -70,6 +72,14 @@ export class ProfileComponent implements OnInit {
     if (currentUser) {
       this.user.set(currentUser);
       this.loadUserPosts(currentUser.id);
+
+      this.userService.getUserById(currentUser.id).subscribe({
+        next: (updatedUser) => {
+          this.user.set(updatedUser);
+          this.authService.setCurrentUser(updatedUser);
+        },
+        error: (err) => console.error("Erreur rafraîchissement profil", err)
+      });
     }
   }
 
@@ -100,15 +110,20 @@ export class ProfileComponent implements OnInit {
     if (!targetUser || !currentUserId) return;
 
     this.authService.toggleFollow(targetUser.id).subscribe({
-      next: () => {
-        // 1. On rafraîchit le profil visité (pour le compteur followers)
-        this.userService.getUserById(targetUser.id).subscribe(updatedTarget => {
-          this.user.set(updatedTarget);
-        });
+      next: (response) => {
+        if (response?.targetUser) {
+          this.user.set(response.targetUser);
+        } else {
+          this.userService.getUserById(targetUser.id).subscribe(updatedTarget => {
+            this.user.set(updatedTarget);
+          });
+        }
 
-        // 2. On rafraîchit l'utilisateur connecté (pour le bouton follow via computed)
-        // La méthode refreshCurrentUser doit être dans ton AuthService
-        this.authService.refreshCurrentUser();
+        if (response?.currentUser) {
+          this.authService.setCurrentUser(response.currentUser);
+        } else {
+          this.authService.refreshCurrentUser();
+        }
 
         this.snackBar.open("Mise à jour réussie", 'OK', { duration: 2000 });
       },
@@ -125,6 +140,34 @@ export class ProfileComponent implements OnInit {
 
   onEditProfile(): void {
     this.snackBar.open('Édition bientôt disponible', 'OK', { duration: 2000 });
+  }
+
+  onReportProfile(): void {
+    const targetUser = this.user();
+    const currentUserId = this.authService.getUserId();
+
+    if (!targetUser || !currentUserId || targetUser.id === currentUserId) return;
+
+    const reason = prompt(`Reason for reporting ${targetUser.username}:`);
+
+    if (reason && reason.trim()) {
+      const report = {
+        reportedProfileId: targetUser.id,
+        reporterId: currentUserId,
+        reason: reason.trim(),
+        timestamp: new Date()
+      };
+
+      this.reportService.sendReport(report).subscribe({
+        next: () => {
+          this.snackBar.open('Report sent to administrators', 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          console.error('Failed to send report', err);
+          this.snackBar.open('Error sending report', 'Close', { duration: 3000 });
+        }
+      });
+    }
   }
 
   openChangePasswordDialog(): void {

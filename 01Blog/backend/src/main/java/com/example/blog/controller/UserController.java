@@ -7,14 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.apache.catalina.connector.Response;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.example.blog.dto.ChangePasswordRequest;
+import com.example.blog.dto.UserResponseDto;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,8 +34,11 @@ public class UserController {
      * Retourne la liste de tous les utilisateurs pour la recherche
      */
     @GetMapping
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> getAllUsers() {
+        return userRepository.findAll().stream()
+                .map(UserResponseDto::from)
+                .toList();
     }
 
     /**
@@ -41,8 +46,10 @@ public class UserController {
      * Retourne un utilisateur spécifique pour afficher son profil
      */
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable Long id) {
+    @Transactional(readOnly = true)
+    public ResponseEntity<UserResponseDto> getUserById(@PathVariable Long id) {
         return userRepository.findById(id)
+                .map(UserResponseDto::from)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -51,15 +58,17 @@ public class UserController {
      * Inscription / Enregistrement
      */
     @PostMapping("/signup")
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
+    @Transactional
+    public ResponseEntity<UserResponseDto> saveUser(@RequestBody User user) {
         User savedUser = userRepository.save(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+        return new ResponseEntity<>(UserResponseDto.from(savedUser), HttpStatus.CREATED);
     }
 
     /**
      * Logique Follow / Unfollow
      */
     @PostMapping("/{targetId}/follow")
+    @Transactional
     public ResponseEntity<?> toggleFollow(
             @PathVariable Long targetId, 
             @RequestParam Long currentUserId) {
@@ -75,15 +84,22 @@ public class UserController {
             return ResponseEntity.badRequest().body("On ne peut pas se suivre soi-même");
         }
 
-        // Logique de bascule (Toggle)
-        if (currentUser.getFollowing().contains(targetUser)) {
-            currentUser.getFollowing().remove(targetUser);
+        boolean alreadyFollowing = currentUser.getFollowing().stream()
+                .anyMatch(user -> targetId.equals(user.getId()));
+
+        if (alreadyFollowing) {
+            currentUser.getFollowing().removeIf(user -> targetId.equals(user.getId()));
+            targetUser.getFollowers().removeIf(user -> currentUserId.equals(user.getId()));
         } else {
             currentUser.getFollowing().add(targetUser);
+            targetUser.getFollowers().add(currentUser);
         }
         
         userRepository.save(currentUser);
-        return ResponseEntity.ok().body("{\"message\": \"Success\"}");
+        return ResponseEntity.ok(Map.of(
+                "message", alreadyFollowing ? "Unfollowed" : "Followed",
+                "currentUser", UserResponseDto.from(currentUser),
+                "targetUser", UserResponseDto.from(targetUser)));
     }
     @PostMapping("/change-password")
 public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {

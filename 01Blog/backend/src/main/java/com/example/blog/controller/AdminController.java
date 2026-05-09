@@ -10,8 +10,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog.entities.Post;
@@ -85,4 +87,23 @@ public ResponseEntity<String> toggleHidePost(@PathVariable Long id) {
     }
     // @PostMapping("/bantoggele/{id}")
     // public ResponseEntity<>
+
+
+    // ---------------------------
+    // Bannissement (Ban/Unban)
+    // ---------------------------
+
+    @PutMapping("/users/{id}/block")
+public ResponseEntity<?> toggleUserBlock(@PathVariable Long id, @RequestParam boolean block) {
+    User user = userRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    
+    user.setIsBlocked(block);
+    userRepository.save(user);
+    
+    // Créer un objet JSON au lieu d'une simple String
+    return ResponseEntity.ok().body(java.util.Map.of(
+        "message", "User " + user.getUsername() + " has been " + (block ? "banned" : "unbanned")
+    ));
+}
 }

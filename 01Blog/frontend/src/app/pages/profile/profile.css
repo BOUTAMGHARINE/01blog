@@ -80,6 +80,13 @@
   margin: 8px 0;
 }
 
+.profile-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
 /* --- FEED SECTION --- */
 .posts-feed {
   max-width: 600px;

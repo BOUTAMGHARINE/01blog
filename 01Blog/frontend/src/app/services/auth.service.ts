@@ -17,13 +17,18 @@ export class AuthService {
 
   constructor(private http: HttpClient) { }
 
+  setCurrentUser(user: any): void {
+    this.currentUser.set(user);
+    localStorage.setItem('user', JSON.stringify(user));
+  }
+
   login(data: any): Observable<any> {
     return this.http.post(`${this.baseUrl}signin`, data).pipe(
       tap((response : any) => {
         console.log(response,"--------------------------------------------------------");
         
         // On stocke la réponse (qui contient l'ID, le username, etc.)
-        this.currentUser.set(response.user);
+        this.setCurrentUser(response.user);
         console.log("Utilisateur connecté :", response);
       })
     );
@@ -65,8 +70,7 @@ refreshCurrentUser(): void {
   const userId = this.getUserId();
   if (userId) {
     this.http.get(`http://localhost:8080/api/users/${userId}`).subscribe(updatedUser => {
-      this.currentUser.set(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser)); // Optionnel: garde le localstorage à jour
+      this.setCurrentUser(updatedUser);
     });
   }
 }

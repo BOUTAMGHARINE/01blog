@@ -31,9 +31,11 @@ public class ReportController {
     }
 
    // Seul l'admin peut voir la liste
-    @GetMapping
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<Report> getAllReports() {
-        return reportRepository.findAllByOrderByTimestampDesc();
-    }
+   @GetMapping
+@PreAuthorize("hasRole('ROLE_ADMIN')")
+public List<Report> getAllReports() {
+    List<Report> reports = reportRepository.findAllByOrderByTimestampDesc();
+    // On crée une nouvelle ArrayList pour détacher la collection de la session Hibernate
+    return new java.util.ArrayList<>(reports);
+}
  }

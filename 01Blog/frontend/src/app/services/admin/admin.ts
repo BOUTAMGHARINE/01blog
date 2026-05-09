@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
@@ -26,5 +26,14 @@ export class AdminService {
 
   deletePost(id: number): Observable<string> {
     return this.http.delete(`${this.apiUrl}/posts/${id}`, { responseType: 'text' });
+  }
+
+  
+
+  updateUserStatus(userId: number, isBlocked: boolean): Observable<void> {
+    // On passe le booléen en paramètre de requête (?block=true)
+    const params = new HttpParams().set('block', isBlocked);
+    
+    return this.http.put<void>(`${this.apiUrl}/users/${userId}/block`, {}, { params });
   }
 }

@@ -46,18 +46,36 @@
               </td>
             </ng-container>
 
-            <ng-container matColumnDef="actions">
-              <th mat-header-cell *matHeaderCellDef> Actions </th>
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
               <td mat-cell *matCellDef="let user">
-                <button mat-icon-button color="warn" (click)="deleteUser(user.id)" *ngIf="user.role !== 'ROLE_ADMIN'"
-                  title="Delete User">
-                  <mat-icon>person_remove</mat-icon>
-                </button>
+                <span class="status-badge" [class.is-blocked]="user.isBlocked">
+                  {{ user.isBlocked ? 'BANNED' : 'ACTIVE' }}
+                </span>
               </td>
             </ng-container>
 
-            <tr mat-header-row *matHeaderRowDef="['id', 'username', 'role', 'actions']"></tr>
-            <tr mat-row *matRowDef="let row; columns: ['id', 'username', 'role', 'actions'];"></tr>
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let user">
+                <div class="action-group" *ngIf="user.role !== 'ROLE_ADMIN'">
+                  <button mat-icon-button 
+                          [color]="user.isBlocked ? 'primary' : 'warn'" 
+                          (click)="toggleBan(user)"
+                          [title]="user.isBlocked ? 'Unban User' : 'Ban User'">
+                    <mat-icon>{{ user.isBlocked ? 'check_circle' : 'block' }}</mat-icon>
+                  </button>
+
+                  <button mat-icon-button color="warn" (click)="deleteUser(user.id)"
+                    title="Delete User">
+                    <mat-icon>person_remove</mat-icon>
+                  </button>
+                </div>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="['id', 'username', 'role', 'status', 'actions']"></tr>
+            <tr mat-row *matRowDef="let row; columns: ['id', 'username', 'role', 'status', 'actions'];"></tr>
           </table>
 
           <div class="empty-state" *ngIf="users().length === 0">

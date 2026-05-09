@@ -27,6 +27,12 @@
           <mat-icon>{{ isFollowingUser() ? 'person_remove' : 'person_add' }}</mat-icon>
           {{ isFollowingUser() ? 'Unfollow' : 'Follow' }}
         </button>
+
+        <button mat-stroked-button color="warn" *ngIf="user()?.id !== authService.getUserId()"
+          (click)="onReportProfile()">
+          <mat-icon>report</mat-icon>
+          Report Profile
+        </button>
       </div>
 
       <div class="user-stats">

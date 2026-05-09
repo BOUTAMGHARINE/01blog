@@ -81,3 +81,22 @@
   font-size: 14px;
   color: #636e72;
 }
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.is-blocked {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.action-group {
+  display: flex;
+  gap: 4px;
+}

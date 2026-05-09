@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.blog.dto.SignupRequest;
+import com.example.blog.dto.UserResponseDto;
 import com.example.blog.entities.User;
 import com.example.blog.repository.UserRepository;
 import com.example.blog.security.JwtUtils;
@@ -66,10 +68,11 @@ public class AuthenticationController {
     //     return jwtUtils.generateToken(userDetails.getUsername());
     // }
     @PostMapping("/signin")
+    @Transactional(readOnly = true)
     public ResponseEntity<?> authenticateUser(@RequestBody User  user) {
-          //  System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 
             UserDetails userDetailss = userDetailsService.loadUserByUsername(user.getUsername());
+
                 System.out.println(".(------------------------------)"+!userDetailss.isAccountNonLocked());
 
           
@@ -80,22 +83,31 @@ public class AuthenticationController {
     }
 
 
+
+
     System.out.println(".(------------------------------)"+!userDetailss.isAccountNonLocked());
     Authentication authentication = authenticationManager.authenticate(
         new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
             user.getUsername(),
             user.getPassword())
     );
+
     UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
   User userInformations = userRepository.findByUsername(userDetails.getUsername());
+
+
 
    // System.out.println(role+"ppppppppppppppppppppppppppppppppppppppppppppppppppppppppppppp");
     String token = jwtUtils.generateToken(userDetails.getUsername(),userInformations);
     Map<String,Object> response = new HashMap<>();
       //
     response.put("token",token);
-    response.put("user",userInformations);
+    response.put("user", UserResponseDto.from(userInformations));
+    System.out.println("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+   // System.out.println(userInformations+"ppppppppppppppppppppppppppppppp");
+
+
 
     return ResponseEntity.ok(response);
     
@@ -103,6 +115,7 @@ public class AuthenticationController {
 
 
     @PostMapping("/signup")
+   @Transactional
    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest request) {
     if (userRepository.existsByEmail(request.getEmail())) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
@@ -121,9 +134,9 @@ public class AuthenticationController {
     user.setPassword(encoder.encode(request.getPassword()));
     user.setRole("user");
 
-    userRepository.save(user);
+    User savedUser = userRepository.save(user);
 
-    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDto.from(savedUser));
 }
 
 

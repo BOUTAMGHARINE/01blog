@@ -82,4 +82,37 @@ export class AdminPanelComponent implements OnInit {
       });
     }
   }
+
+
+  // Ton signal qui contient la liste des utilisateurs
+
+toggleBan(user: any): void {
+    const newStatus = !user.isBlocked;
+    const actionLabel = newStatus ? 'ban' : 'unban';
+
+    // Confirmation dialog
+    if (confirm(`Are you sure you want to ${actionLabel} user ${user.username}?`)) {
+      
+      this.adminService.updateUserStatus(user.id, newStatus).subscribe({
+        next: () => {
+          // Reactive update of the signal
+          this.users.update(allUsers => 
+            allUsers.map(u => u.id === user.id ? { ...u, isBlocked: newStatus } : u)
+          );
+
+          this.snackBar.open(
+            `User ${user.username} ${newStatus ? 'banned' : 'unbanned'} successfully`, 
+            'Close', 
+            { duration: 3000 }
+          );
+        },
+        error: (err) => {
+          console.error(err);
+          this.snackBar.open("Error updating user status", "Close", { duration: 3000 });
+        }
+      });
+    }
+  }
 }
+
+

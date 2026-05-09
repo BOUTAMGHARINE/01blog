@@ -4,8 +4,6 @@ package com.example.blog.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
@@ -18,7 +16,10 @@ import java.util.List;
 
 import java.util.Set;
 
-import lombok.Data;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 
 
@@ -36,7 +37,10 @@ import lombok.Data;
 
 @Entity
 @Table(name = "users")
-@Data
+@Getter
+@Setter
+@ToString(exclude = {"posts", "comments", "reactions", "following", "followers"})
+
 public class User {
 
     @Id
@@ -53,14 +57,16 @@ public class User {
     
     private String role;
     
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     @Column(nullable=false)
-        boolean  isBlocked = false;
+    private boolean isBlocked = false;
     
     // --- Relations avec les contenus ---
 
     // Ajout de orphanRemoval = true pour supprimer les posts si l'user est supprimé
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonIgnore 
+    @JsonIgnore
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -82,11 +88,11 @@ public class User {
         joinColumns = @JoinColumn(name = "follower_id"),
         inverseJoinColumns = @JoinColumn(name = "following_id")
     )
-    @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
+    @JsonIgnore
     private Set<User> following = new HashSet<>();
 
     @ManyToMany(mappedBy = "following")
-    @JsonIgnoreProperties({"following", "followers", "posts", "comments"})
+    @JsonIgnore
     private Set<User> followers = new HashSet<>();
 
     // --- Méthodes de cycle de vie (PreRemove) ---
@@ -136,7 +142,28 @@ public void setFollowers(Set<User> followers) {
 //     this.isBlocked =  true;
 // }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof User user)) {
+            return false;
+        }
+        return id != null && id.equals(user.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
+
+    @JsonProperty("isBlocked")
     public boolean getIsBlocked() {
         return  this.isBlocked;
+    }
+    public  void setIsBlocked(boolean  value) {
+        this.isBlocked = value;
+        
     }
 }
