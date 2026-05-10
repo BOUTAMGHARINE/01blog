@@ -28,7 +28,7 @@ export const customInterceptor: HttpInterceptorFn = (req, next) => {
         // 1. Nettoyer le localStorage
          authService.logout();
         // 2. Rediriger vers la page de login
-        router.navigate(['/login']);
+        router.navigate(['/login'], { replaceUrl: true });
       }
       
       return throwError(() => error);

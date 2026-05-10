@@ -41,14 +41,17 @@ export class AuthService {
   // Méthode pour récupérer l'ID facilement
   getUserId(): number | null {
     const user = this.currentUser();
-    console.log(this.currentUser,"ghgjhgjgjgjggh");
-    
     return user ? user.id : null;
   }
   getUserRole():String | null{
     const user = this.currentUser();
     return user ? user.role :null;
   }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem('token') && !!this.getUserId();
+  }
+
   // Dans auth.service.ts
 toggleFollow(targetUserId: number): Observable<any> {
   const currentUserId = this.getUserId();

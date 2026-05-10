@@ -35,38 +35,78 @@ export class HomeComponent implements OnInit {
   allUsers = signal<any[]>([]); // Liste chargée au init
 
   // 3. Propriété calculée pour le badge (matBadge)
-  unreadCount = computed(() => 
-    this.notifications().filter(n => !n.read).length
+  unreadCount = computed(() =>
+    this.notifications().filter(n => !this.isNotificationRead(n)).length
   );
 
 
   loadNotifications(userId: number): void {
   this.notificationService.getNotifications(userId).subscribe({
     next: (data : any) => {
-      console.log('Format reçu du serveur :', data[0]); // <--- REGARDE ICI
-      this.notifications.set(data);
+      this.notifications.set(data.map((notification: any) => this.normalizeNotification(notification)));
     },
     error: (err : any) => console.error('Error:', err)
   });
+}
+
+isNotificationRead(notification: any): boolean {
+  return !!(notification?.read ?? notification?.isRead);
+}
+
+private normalizeNotification(notification: any): any {
+  const read = this.isNotificationRead(notification);
+  return { ...notification, read, isRead: read };
 }
 
 
   // Fonction appelée quand on ouvre le menu
 onMenuOpened(): void {
   const userId = this.authService.getUserId();
-  
-  if (userId && this.unreadCount() > 0) {
-    // Mise à jour LOCALE
-    this.notifications.update(currentNotifs => 
-      currentNotifs.map(n => ({
-        ...n, 
-        read: true // On utilise 'read' ici au lieu de 'isRead'
-      }))
-    );
+  if (userId) this.loadNotifications(userId);
+}
 
-    // Mise à jour SERVEUR
-    this.notificationService.markAllAsRead(userId).subscribe();
-  }
+markAllNotificationsAsRead(event?: MouseEvent): void {
+  event?.stopPropagation();
+  const userId = this.authService.getUserId();
+  if (!userId || this.unreadCount() === 0) return;
+
+  this.notifications.update(currentNotifs =>
+    currentNotifs.map(n => ({ ...n, read: true, isRead: true }))
+  );
+
+  this.notificationService.markAllAsRead(userId).subscribe({
+    error: (err) => {
+      console.error('Error marking notifications as read', err);
+      this.loadNotifications(userId);
+    }
+  });
+}
+
+toggleNotificationRead(notification: any, event: MouseEvent): void {
+  event.stopPropagation();
+  const nextReadState = !this.isNotificationRead(notification);
+
+  this.notifications.update(currentNotifs =>
+    currentNotifs.map(n =>
+      n.id === notification.id ? { ...n, read: nextReadState, isRead: nextReadState } : n
+    )
+  );
+
+  this.notificationService.updateReadState(notification.id, nextReadState).subscribe({
+    next: (updatedNotification) => {
+      const normalizedNotification = this.normalizeNotification(updatedNotification);
+      this.notifications.update(currentNotifs =>
+        currentNotifs.map(n =>
+          n.id === notification.id ? { ...n, ...normalizedNotification } : n
+        )
+      );
+    },
+    error: (err) => {
+      console.error('Error updating notification read state', err);
+      const userId = this.authService.getUserId();
+      if (userId) this.loadNotifications(userId);
+    }
+  });
 }
 
 
@@ -97,7 +137,8 @@ onMenuOpened(): void {
   ngOnInit(): void {
     this.currentUserId = this.authService.getUserId();
     if (this.currentUserId ==  null){
-      this.router.navigate(['login']);
+      this.authService.logout();
+      this.router.navigate(['/login'], { replaceUrl: true });
       return;
       
     }
@@ -119,11 +160,11 @@ onMenuOpened(): void {
 
   loadPosts(): void {
        if (this.currentUserId ==  null){
-      this.router.navigate(['login']);
+      this.authService.logout();
+      this.router.navigate(['/login'], { replaceUrl: true });
       return;
       
     }
-    console.log('---------------------------------------------',this.currentUserId);
     
     this.postService.getAllPosts().subscribe({
       next: (data) => this.posts.set(data),

@@ -4,13 +4,20 @@
       <mat-icon>security</mat-icon>
       <h1>Admin Dashboard</h1>
     </div>
-    <button mat-stroked-button color="primary" routerLink="/home">
-      <mat-icon>arrow_back</mat-icon>
-      Back to Feed
-    </button>
+    <div class="header-actions">
+      <button mat-flat-button color="warn" (click)="openReportsTab()">
+        <mat-icon>flag</mat-icon>
+        View Reports
+      </button>
+
+      <button mat-stroked-button color="primary" routerLink="/home">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Feed
+      </button>
+    </div>
   </header>
 
-  <mat-tab-group dynamicHeight animationDuration="500ms">
+  <mat-tab-group dynamicHeight animationDuration="500ms" [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="selectedTabIndex.set($event)">
 
     <mat-tab>
       <ng-template mat-tab-label>
@@ -116,6 +123,74 @@
                 <mat-icon>delete_forever</mat-icon>
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">flag</mat-icon>
+        Reports
+      </ng-template>
+
+      <div class="tab-content">
+        <div class="reports-list">
+          <div class="report-item" *ngFor="let report of reports()">
+            <div class="report-icon">
+              <mat-icon>report</mat-icon>
+            </div>
+
+            <div class="report-info">
+              <div class="report-meta">
+                <strong>Report #{{ report.id }}</strong>
+                <span>{{ report.timestamp | date:'short' }}</span>
+              </div>
+
+              <div class="report-users">
+                <div>
+                  <span class="report-label">Reporter</span>
+                  <strong>@{{ report.reporter?.username || 'Unknown user' }}</strong>
+                  <small>#{{ report.reporterId }} {{ report.reporter?.email ? '- ' + report.reporter.email : '' }}</small>
+                </div>
+
+                <mat-icon>arrow_forward</mat-icon>
+
+                <div>
+                  <span class="report-label">Reported profile</span>
+                  <strong>@{{ report.reportedProfile?.username || 'Unknown user' }}</strong>
+                  <small>#{{ report.reportedProfileId }} {{ report.reportedProfile?.email ? '- ' + report.reportedProfile.email : '' }}</small>
+                </div>
+              </div>
+
+              <p class="report-reason"><strong>Reason:</strong> {{ report.reason || 'No reason provided.' }}</p>
+
+              <div class="report-actions">
+                <button mat-stroked-button
+                        [color]="report.reportedProfile?.isBlocked ? 'primary' : 'warn'"
+                        [disabled]="!report.reportedProfileId"
+                        (click)="toggleReportedUserBan(report)">
+                  <mat-icon>{{ report.reportedProfile?.isBlocked ? 'check_circle' : 'block' }}</mat-icon>
+                  {{ report.reportedProfile?.isBlocked ? 'Unban User' : 'Ban User' }}
+                </button>
+
+                <button mat-stroked-button color="warn"
+                        [disabled]="!report.reportedProfileId"
+                        (click)="deleteReportedUser(report)">
+                  <mat-icon>person_remove</mat-icon>
+                  Delete User
+                </button>
+
+                <button mat-button (click)="dismissReport(report.id)">
+                  <mat-icon>done</mat-icon>
+                  Dismiss
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-state" *ngIf="reports().length === 0">
+            <p>No reports found.</p>
           </div>
         </div>
       </div>

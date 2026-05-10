@@ -37,14 +37,19 @@ export class LoginComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (localStorage.getItem('user') != null && localStorage.getItem('token') != null) {
-      this.router.navigate(['home']);
-      return;
-    }
     this.loginForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(40)]],
       password: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(45)]]
     });
+
+    if (this.authService.isAuthenticated()) {
+      this.router.navigate(['/home'], { replaceUrl: true });
+      return;
+    }
+
+    if (localStorage.getItem('token') || localStorage.getItem('user')) {
+      this.authService.logout();
+    }
   }
 
   onSubmit(): void {

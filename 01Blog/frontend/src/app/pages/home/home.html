@@ -27,20 +27,35 @@
         <mat-icon>home</mat-icon>
       </button>
 
-      <button mat-icon-button class="nav-btn" [matMenuTriggerFor]="notifMenu" (menuOpened)="onMenuOpened()"> <mat-icon
+      <button mat-icon-button class="nav-btn" [matMenuTriggerFor]="notifMenu" (menuOpened)="onMenuOpened()">
+        <mat-icon aria-hidden="false" aria-label="Notifications"
           [matBadge]="unreadCount()" matBadgeColor="warn" [matBadgeHidden]="unreadCount() === 0">
           notifications
         </mat-icon>
       </button>
 
       <mat-menu #notifMenu="matMenu" class="notification-menu">
-        <div class="notif-header">Notifications</div>
-        <button mat-menu-item *ngFor="let n of notifications()" (click)="goToPost(n.postId)">
+        <div class="notif-header" (click)="$event.stopPropagation()">
+          <span>Notifications</span>
+          <button mat-button type="button" [disabled]="unreadCount() === 0" (click)="markAllNotificationsAsRead($event)">
+            Mark all read
+          </button>
+        </div>
+
+        <div class="notif-menu-row" *ngFor="let n of notifications()" [class.unread-notif]="!isNotificationRead(n)" (click)="goToPost(n.postId)">
           <div class="notif-item">
-            <p>{{ n.message }}</p>
-            <small>{{ n.createdAt | date:'short' }}</small>
+            <div class="notif-text">
+              <p>{{ n.message }}</p>
+              <small>{{ n.createdAt | date:'short' }}</small>
+            </div>
+
+            <button mat-icon-button type="button"
+                    [title]="isNotificationRead(n) ? 'Mark as unread' : 'Mark as read'"
+                    (click)="toggleNotificationRead(n, $event)">
+              <mat-icon>{{ isNotificationRead(n) ? 'mark_email_unread' : 'done' }}</mat-icon>
+            </button>
           </div>
-        </button>
+        </div>
         <div *ngIf="notifications().length === 0" class="empty-notif">
           No new notifications.
         </div>

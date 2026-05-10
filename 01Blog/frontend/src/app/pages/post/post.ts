@@ -8,6 +8,7 @@ import { ReactionService } from '../../services/reaction';
 import { PostCommentsComponent } from '../post-comments/post-comments';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importe le service et le module
 import { ReportService } from '../../services/report/report';
+import { AdminService } from '../../services/admin/admin';
 @Component({
   selector: 'app-post-item',
   standalone: true,
@@ -26,6 +27,7 @@ export class PostItemComponent {
   private snackBar = inject(MatSnackBar);
   private reactionService = inject(ReactionService);
   private reportService = inject(ReportService)
+  private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
 
   @Input({ required: true }) post: any;
@@ -59,19 +61,60 @@ export class PostItemComponent {
   }
 
   updatePost(post: any, newContent: string) {
-    if (!newContent.trim()) return;
-    this.postService.updatePost(post.id, newContent).subscribe({
+    const content = newContent.trim();
+    const authorId = post.author?.id || this.currentUserId;
+    if (!content || !authorId) return;
+
+    console.log('Updating post', {
+      postId: post.id,
+      postAuthorId: post.author?.id,
+      currentUserId: this.currentUserId,
+      sentAuthorId: authorId
+    });
+
+    this.postService.updatePost(post.id, content, authorId).subscribe({
       next: () => {
-        this.post = { ...this.post, content: newContent, isEditing: false };
+        this.post = { ...this.post, content, isEditing: false };
         this.cdr.detectChanges();
-      }
+        this.snackBar.open('Post updated successfully', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        console.error('Error updating post', err);
+        this.snackBar.open('You are not allowed to edit this post', 'Close', { duration: 3000 });
+      } 
     });
   }
 
-  onDeletePost(postId: number): void {
+  onDeletePost(post: any): void {
+    const postId = post.id;
+    const authorId = post.author?.id || this.currentUserId;
+
     if (confirm('Voulez-vous supprimer ce post ?')) {
-      this.postService.deletePost(postId).subscribe({
-        next: () => this.postDeleted.emit(postId)
+      if (this.isAdmin && post.author?.id !== this.currentUserId) {
+        this.adminService.deletePost(postId).subscribe({
+          next: () => {
+            this.postDeleted.emit(postId);
+            this.snackBar.open('Post deleted successfully', 'Close', { duration: 2000 });
+          },
+          error: (err) => {
+            console.error('Error deleting post as admin', err);
+            this.snackBar.open('Error deleting post', 'Close', { duration: 3000 });
+          }
+        });
+        return;
+      }
+
+      if (!authorId) return;
+
+      this.postService.deletePost(postId, authorId).subscribe({
+        next: () => {
+          this.postDeleted.emit(postId);
+          this.snackBar.open('Post deleted successfully', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          console.error('Error deleting post', err);
+          this.snackBar.open('You are not allowed to delete this post', 'Close', { duration: 3000 });
+        }
       });
     }
   }

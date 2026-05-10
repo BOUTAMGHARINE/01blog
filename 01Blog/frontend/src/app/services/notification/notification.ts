@@ -23,6 +23,10 @@ export class NotificationService {
     return this.http.put<void>(`${this.apiUrl}/${notificationId}/read`, {});
   }
 
+  updateReadState(notificationId: number, read: boolean): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${notificationId}/read-state?read=${read}`, {});
+  }
+
   markAllAsRead(userId: number): Observable<void> {
    return this.http.put<void>(`${this.apiUrl}/user/${userId}/read-all`, {});
   }

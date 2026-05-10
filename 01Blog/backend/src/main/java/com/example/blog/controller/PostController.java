@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.blog.service.*;
@@ -22,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -69,15 +72,16 @@ public List<Post> getPosts() {
 }
 
 
-    @DeleteMapping("/deletepost/{postId}")
+    @DeleteMapping({"/deletepost/{postId}", "/{postId}"})
     public ResponseEntity<String> deletePost(
             @PathVariable Long postId,
-            @RequestParam Long authorId) {
+            @RequestParam(required = false) Long authorId,
+            Principal principal) {
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        if (!post.getAuthor().getId().equals(authorId)) {
+        if (!canManagePost(post, authorId, principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("You are not allowed to delete this post");
         }
@@ -86,24 +90,60 @@ public List<Post> getPosts() {
         return ResponseEntity.ok("Post deleted successfully");
     }
 
-    @PutMapping("editpost/{id}")
+    @PutMapping({"editpost/{id}", "/{id}"})
     public ResponseEntity<String> updatePost(
             @PathVariable Long id,
-            @RequestBody PostRequestDTO dto) {
+            @RequestBody PostRequestDTO dto,
+            Principal principal) {
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 
-        if (!post.getAuthor().getId().equals(dto.getAuthorId())) {
+        if (!canManagePost(post, dto.getAuthorId(), principal)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("You are not allowed to edit this post");
         }
 
         post.setContent(dto.getContent());
-        post.setHidden(dto.isHidden());
 
         postRepository.save(post);
 
         return ResponseEntity.ok("Post updated successfully");
+    }
+
+    private boolean canManagePost(Post post, Long authorId, Principal principal) {
+        if (post.getAuthor() == null) {
+            return false;
+        }
+
+        Long postAuthorId = post.getAuthor().getId();
+        if (authorId != null && postAuthorId != null && postAuthorId.longValue() == authorId.longValue()) {
+            return true;
+        }
+
+        if (principal != null && post.getAuthor().getUsername().equals(principal.getName())) {
+            return true;
+        }
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            System.out.println("Post authorization failed: no authenticated user");
+            return false;
+        }
+
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+
+        boolean allowed = isAdmin || post.getAuthor().getUsername().equals(authentication.getName());
+        if (!allowed) {
+            System.out.println("Post authorization failed. postId=" + post.getId()
+                    + ", postAuthorId=" + postAuthorId
+                    + ", receivedAuthorId=" + authorId
+                    + ", postAuthorUsername=" + post.getAuthor().getUsername()
+                    + ", principal=" + (principal != null ? principal.getName() : null)
+                    + ", authentication=" + authentication.getName());
+        }
+
+        return allowed;
     }
 }

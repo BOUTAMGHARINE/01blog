@@ -22,7 +22,7 @@
       <span>Modifier</span>
     </button>
 
-    <button mat-menu-item (click)="onDeletePost(post.id)" *ngIf="post.author?.id === currentUserId || isAdmin">
+    <button mat-menu-item (click)="onDeletePost(post)" *ngIf="post.author?.id === currentUserId || isAdmin">
       <mat-icon color="warn">delete</mat-icon>
       <span>Supprimer</span>
     </button>

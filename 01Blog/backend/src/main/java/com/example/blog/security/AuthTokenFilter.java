@@ -103,7 +103,10 @@ while (headerNames.hasMoreElements()) {
     String name = headerNames.nextElement();
 }
 
-        String headerAuth = request.getHeader("authorization");//authorization
+        String headerAuth = request.getHeader("Authorization");
+        if (headerAuth == null) {
+            headerAuth = request.getHeader("authorization");
+        }
         if (headerAuth != null && headerAuth.startsWith(BEARER_)) {
             return headerAuth.substring(BEARER_.length());
         }

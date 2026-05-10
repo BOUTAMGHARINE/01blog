@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import com.example.blog.entities.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -14,7 +13,6 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserResponseDto {
-    @JsonIgnore
     private Long id;
     private String username;
     private String email;

@@ -28,12 +28,12 @@ export class PostService {
   }
 
   // 4. Supprimer un post
-  deletePost(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deletePost(id: number, authorId: number): Observable<string> {
+    return this.http.delete(`${this.apiUrl}/${id}?authorId=${authorId}`, { responseType: 'text' });
   }
 
   // 5. Mettre à jour un post
-  updatePost(id: number, postData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${id}`, postData);
+  updatePost(id: number, content: string, authorId: number): Observable<string> {
+    return this.http.put(`${this.apiUrl}/${id}`, { content, authorId }, { responseType: 'text' });
   }
 }

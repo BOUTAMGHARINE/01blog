@@ -2,6 +2,7 @@ package com.example.blog.controller;
 
 import com.example.blog.entities.Notification;
 import com.example.blog.repository.NotificationRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,6 +37,16 @@ public class NotificationController {
             n.setRead(true);
             notificationRepository.save(n);
         });
+    }
+
+    @PutMapping("/{id}/read-state")
+    public ResponseEntity<Notification> updateReadState(@PathVariable Long id, @RequestParam boolean read) {
+        return notificationRepository.findById(id)
+                .map(notification -> {
+                    notification.setRead(read);
+                    return ResponseEntity.ok(notificationRepository.save(notification));
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping

@@ -8,6 +8,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +30,7 @@ public class Notification {
 
     private String message;
     private LocalDateTime createdAt;
+    @JsonProperty("read")
     private boolean isRead = false;
     
     private Long postId; // Pour cliquer et aller sur le post

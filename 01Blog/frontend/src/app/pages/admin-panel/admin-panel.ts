@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterLink } from '@angular/router';
 import { AdminService } from '../../services/admin/admin';
+import { ReportService } from '../../services/report/report';
 @Component({
   selector: 'app-admin-panel',
   standalone: true,
@@ -25,14 +26,18 @@ import { AdminService } from '../../services/admin/admin';
 export class AdminPanelComponent implements OnInit {
   // On utilise inject() ou le constructeur, mais restons cohérents avec ton service
   private adminService = inject(AdminService);
+  private reportService = inject(ReportService);
   private snackBar = inject(MatSnackBar);
 
+  selectedTabIndex = signal(0);
   users = signal<any[]>([]);
   posts = signal<any[]>([]);
+  reports = signal<any[]>([]);
 
   ngOnInit(): void {
     this.loadUsers();
     this.loadAllPosts();
+    this.loadReports();
   }
 
   loadUsers() {
@@ -49,6 +54,17 @@ export class AdminPanelComponent implements OnInit {
     });
   }
 
+  loadReports() {
+    this.reportService.getReports().subscribe({
+      next: (data) => this.reports.set(data),
+      error: (err) => console.error("Erreur chargement reports", err)
+    });
+  }
+
+  openReportsTab(): void {
+    this.selectedTabIndex.set(2);
+  }
+
   deleteUser(userId: number) {
     if (confirm('Voulez-vous vraiment supprimer cet utilisateur ?')) {
       this.adminService.deleteUser(userId).subscribe({
@@ -58,6 +74,82 @@ export class AdminPanelComponent implements OnInit {
         }
       });
     }
+  }
+
+  deleteReportedUser(report: any): void {
+    const reportedUser = report.reportedProfile;
+    const reportedUserId = report.reportedProfileId;
+    const username = reportedUser?.username || `#${reportedUserId}`;
+
+    if (!reportedUserId || !confirm(`Delete reported user ${username}? This action is permanent.`)) return;
+
+    this.adminService.deleteUser(reportedUserId).subscribe({
+      next: (response) => {
+        this.users.update(users => users.filter(user => user.id !== reportedUserId));
+        this.reports.update(reports => reports.filter(item => item.reportedProfileId !== reportedUserId));
+        this.snackBar.open(response, 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error deleting reported user', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  toggleReportedUserBan(report: any): void {
+    const reportedUser = report.reportedProfile;
+    const reportedUserId = report.reportedProfileId;
+    const isBlocked = !!reportedUser?.isBlocked;
+    const newStatus = !isBlocked;
+    const username = reportedUser?.username || `#${reportedUserId}`;
+    const actionLabel = newStatus ? 'ban' : 'unban';
+
+    if (!reportedUserId || !confirm(`Are you sure you want to ${actionLabel} ${username}?`)) return;
+
+    this.adminService.updateUserStatus(reportedUserId, newStatus).subscribe({
+      next: () => {
+        this.users.update(users =>
+          users.map(user => user.id === reportedUserId ? { ...user, isBlocked: newStatus } : user)
+        );
+        this.reports.update(reports =>
+          reports.map(item =>
+            item.reportedProfileId === reportedUserId
+              ? {
+                  ...item,
+                  reportedProfile: item.reportedProfile
+                    ? { ...item.reportedProfile, isBlocked: newStatus }
+                    : item.reportedProfile
+                }
+              : item
+          )
+        );
+
+        this.snackBar.open(
+          `Reported user ${username} ${newStatus ? 'banned' : 'unbanned'} successfully`,
+          'Close',
+          { duration: 3000 }
+        );
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error updating reported user status', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  dismissReport(reportId: number): void {
+    if (!confirm('Dismiss this report?')) return;
+
+    this.reportService.deleteReport(reportId).subscribe({
+      next: (response) => {
+        this.reports.update(reports => reports.filter(report => report.id !== reportId));
+        this.snackBar.open(response, 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error(err);
+        this.snackBar.open('Error dismissing report', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   onToggleHide(post: any) {
@@ -114,5 +206,3 @@ toggleBan(user: any): void {
     }
   }
 }
-
-

@@ -16,6 +16,12 @@
   padding-bottom: 15px;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .admin-header h1 {
   display: flex;
   align-items: center;
@@ -99,4 +105,87 @@
 .action-group {
   display: flex;
   gap: 4px;
+}
+
+.reports-list {
+  display: grid;
+  gap: 12px;
+}
+
+.report-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.report-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #ffebee;
+  color: #c62828;
+  flex: 0 0 auto;
+}
+
+.report-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.report-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #636e72;
+  font-size: 13px;
+}
+
+.report-users {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.report-users div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.report-users strong,
+.report-users small {
+  overflow-wrap: anywhere;
+}
+
+.report-users mat-icon {
+  color: #636e72;
+}
+
+.report-label {
+  color: #636e72;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.report-reason {
+  margin: 8px 0;
+  color: #2d3436;
+  overflow-wrap: anywhere;
+}
+
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
 }

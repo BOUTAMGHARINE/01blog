@@ -72,6 +72,63 @@
 }
 .btn-cancel { background: transparent; border: none; color: #636e72; font-weight: 600; cursor: pointer; }
 
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 320px;
+  padding: 8px 12px;
+  font-weight: 700;
+  color: var(--text-dark);
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.notif-menu-row {
+  min-width: 320px;
+  max-width: 380px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.notif-menu-row:hover {
+  background: #f8fafc;
+}
+
+.notif-text {
+  min-width: 0;
+}
+
+.notif-text p {
+  margin: 0;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.notif-text small {
+  color: #636e72;
+}
+
+.unread-notif {
+  background: #f1f5ff;
+}
+
+.unread-notif .notif-text p {
+  font-weight: 700;
+}
+
+.empty-notif {
+  padding: 12px;
+  color: #636e72;
+}
+
 /* Post Content */
 .post-header { padding: 15px; display: flex; align-items: center; }
 .user-info { display: flex; gap: 10px; align-items: center; }
