@@ -96,6 +96,8 @@ public List<Post> getPosts() {
             @RequestBody PostRequestDTO dto,
             Principal principal) {
 
+        System.out.println("hiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii");
+
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Post not found"));
 

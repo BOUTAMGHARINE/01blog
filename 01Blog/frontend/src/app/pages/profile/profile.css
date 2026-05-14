@@ -164,3 +164,18 @@
 }
 
 .tab-icon { margin-right: 8px; }
+
+
+.back-home-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: #333;
+}
+
+/* Si tu veux qu'il soit discret sur la photo de couverture */
+.back-home-btn:hover {
+  background-color: white;
+}

@@ -60,30 +60,46 @@ export class PostItemComponent {
     this.cdr.detectChanges();
   }
 
-  updatePost(post: any, newContent: string) {
-    const content = newContent.trim();
-    const authorId = post.author?.id || this.currentUserId;
-    if (!content || !authorId) return;
+updatePost(post: any, newContent: string) {
+  const content = newContent.trim();
+  // On récupère l'ID de l'auteur de l'objet post ou de l'utilisateur courant
+  const authorId = post.author?.id || this.currentUserId;
 
-    console.log('Updating post', {
-      postId: post.id,
-      postAuthorId: post.author?.id,
-      currentUserId: this.currentUserId,
-      sentAuthorId: authorId
-    });
-
-    this.postService.updatePost(post.id, content, authorId).subscribe({
-      next: () => {
-        this.post = { ...this.post, content, isEditing: false };
-        this.cdr.detectChanges();
-        this.snackBar.open('Post updated successfully', 'Close', { duration: 2000 });
-      },
-      error: (err) => {
-        console.error('Error updating post', err);
-        this.snackBar.open('You are not allowed to edit this post', 'Close', { duration: 3000 });
-      } 
-    });
+  // Sécurité de base : ne pas envoyer de contenu vide
+  if (!content) {
+    this.snackBar.open('Le contenu ne peut pas être vide', 'Fermer', { duration: 2000 });
+    return;
   }
+
+  console.log('Tentative de mise à jour :', { postId: post.id, content });
+
+this.postService.updatePost(post.id, content, authorId).subscribe({
+  next: (updatedPostFromServer) => {
+    // ✅ CORE FIX: Update the LOCAL object displayed in the HTML
+    post.content = content; 
+    post.isEditing = false;
+
+    // Force change detection for Angular (useful if using ChangeDetectionStrategy.OnPush)
+    this.cdr.detectChanges();
+
+    this.snackBar.open('Post updated successfully', 'Close', { duration: 2000 });
+  },
+  error: (err) => {
+    console.error('Error during update', err);
+    
+    // If the backend returns a 403 (Forbidden) or 401 (Unauthorized) error, it's a permission issue
+    if (err.status === 403 || err.status === 401) {
+      this.snackBar.open("You do not have permission to edit this post", 'Close', { duration: 3000 });
+    } else {
+      
+      this.snackBar.open("Error while modifying the post", 'Close', { duration: 3000 });
+    }
+    
+    // Optional: you can choose to keep isEditing at true to let the user correct their input
+    // post.isEditing = false; 
+  }
+});
+}
 
   onDeletePost(post: any): void {
     const postId = post.id;

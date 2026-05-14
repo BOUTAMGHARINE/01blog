@@ -56,6 +56,12 @@ export class ProfileComponent implements OnInit {
     return this.authService.isFollowing(targetId);
   });
 
+// ... dans ta classe
+
+goToHome() {
+  this.router.navigate(['/home']);
+}
+
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       const userIdFromUrl = params['id'];
@@ -67,6 +73,8 @@ export class ProfileComponent implements OnInit {
     });
   }
 
+
+  
   loadMyProfile(): void {
     const currentUser = this.authService.currentUser();
     if (currentUser) {

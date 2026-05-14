@@ -33,7 +33,12 @@ export class PostService {
   }
 
   // 5. Mettre à jour un post
-  updatePost(id: number, content: string, authorId: number): Observable<string> {
-    return this.http.put(`${this.apiUrl}/${id}`, { content, authorId }, { responseType: 'text' });
-  }
+ updatePost(id: number, content: string, authorId: number): Observable<string> {
+  const body = { 
+    content: content, 
+    authorId: authorId,
+    hidden: false // ✅ Ajoute une valeur par défaut ici
+  };
+  return this.http.put(`${this.apiUrl}/${id}`, body, { responseType: 'text' });
+}
 }
