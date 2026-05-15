@@ -1,0 +1,33 @@
+# --- ÉTAPE 1 : Build du Frontend Angular ---
+FROM node:20 AS frontend-build
+WORKDIR /app/frontend
+# Copie les fichiers de config npm
+COPY frontend/package*.json ./
+RUN npm install
+# Copie le reste du code frontend et build
+COPY frontend/ ./
+RUN npm run build -- --configuration production
+
+# --- ÉTAPE 2 : Build du Backend Spring Boot ---
+FROM maven:3.9.6-eclipse-temurin-21 AS backend-build
+WORKDIR /app
+# Copie le pom.xml et télécharge les dépendances (cache)
+COPY pom.xml .
+RUN mvn dependency:go-offline
+# Copie le code source
+COPY src ./src
+# Copie le build Angular dans le dossier static de Spring Boot pour qu'il soit servi
+COPY --from=frontend-build /app/frontend/dist/votre-nom-de-projet/browser src/main/resources/static/
+# Build du jar
+RUN mvn clean package -DskipTests
+
+# --- ÉTAPE 3 : Image Finale ---
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+# Copie le jar généré à l'étape précédente
+COPY --from=backend-build /app/target/*.jar app.jar
+# Crée le dossier pour les uploads (si nécessaire selon ta config)
+RUN mkdir uploads
+
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]
