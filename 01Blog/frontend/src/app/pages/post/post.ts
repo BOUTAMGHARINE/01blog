@@ -6,9 +6,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { PostService } from '../../services/post';
 import { ReactionService } from '../../services/reaction';
 import { PostCommentsComponent } from '../post-comments/post-comments';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importe le service et le module
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ReportService } from '../../services/report/report';
 import { AdminService } from '../../services/admin/admin';
+
 @Component({
   selector: 'app-post-item',
   standalone: true,
@@ -17,7 +18,8 @@ import { AdminService } from '../../services/admin/admin';
     MatButtonModule, 
     MatIconModule, 
     MatMenuModule, 
-    PostCommentsComponent
+    PostCommentsComponent,
+    MatSnackBarModule // Ajouté pour garantir que le snackBar fonctionne
   ],
   templateUrl: './post.html',
   styleUrls: ['./post.css']
@@ -26,7 +28,7 @@ export class PostItemComponent {
   private postService = inject(PostService);
   private snackBar = inject(MatSnackBar);
   private reactionService = inject(ReactionService);
-  private reportService = inject(ReportService)
+  private reportService = inject(ReportService);
   private adminService = inject(AdminService);
   private cdr = inject(ChangeDetectorRef);
 
@@ -45,119 +47,115 @@ export class PostItemComponent {
     if (!this.currentUserId) return;
     this.reactionService.toggleLike(post.id, this.currentUserId).subscribe({
       next: (updatedReactions: any[]) => {
-        // Mise à jour immuable pour forcer le changement de couleur du bouton
         this.post = { ...this.post, reactions: updatedReactions };
         this.cdr.detectChanges();
       }
     });
   }
 
-  // Cette fonction incrémente le compteur automatiquement
-  handleNewComment(newComment: any): void {
-    const updatedComments = this.post.comments ? [...this.post.comments, newComment] : [newComment];
-    // On remplace l'objet post pour que {{ post.comments?.length }} se mette à jour
-    this.post = { ...this.post, comments: updatedComments };
-    this.cdr.detectChanges();
-  }
+  /**
+   * CORRECTION : handleNewComment
+   * Ce composant représente UN SEUL post. On ajoute le commentaire 
+   * directement à l'objet "post" reçu en @Input.
+   */
+ handleNewComment(newComment: any) {
+  // 1. On s'assure que le tableau existe
+  const currentComments = this.post.comments ? [...this.post.comments] : [];
 
-updatePost(post: any, newContent: string) {
-  const content = newContent.trim();
-  // On récupère l'ID de l'auteur de l'objet post ou de l'utilisateur courant
-  const authorId = post.author?.id || this.currentUserId;
+  // 2. On crée une NOUVELLE référence de l'objet post avec le NOUVEAU tableau
+  // C'est cette "immuabilité" qui force le compteur HTML à se rafraîchir
+  this.post = {
+    ...this.post,
+    comments: [...currentComments, newComment]
+  };
 
-  // Sécurité de base : ne pas envoyer de contenu vide
-  if (!content) {
-    this.snackBar.open('Le contenu ne peut pas être vide', 'Fermer', { duration: 2000 });
-    return;
-  }
-
-  console.log('Tentative de mise à jour :', { postId: post.id, content });
-
-this.postService.updatePost(post.id, content, authorId).subscribe({
-  next: (updatedPostFromServer) => {
-    // ✅ CORE FIX: Update the LOCAL object displayed in the HTML
-    post.content = content; 
-    post.isEditing = false;
-
-    // Force change detection for Angular (useful if using ChangeDetectionStrategy.OnPush)
-    this.cdr.detectChanges();
-
-    this.snackBar.open('Post updated successfully', 'Close', { duration: 2000 });
-  },
-  error: (err) => {
-    console.error('Error during update', err);
-    
-    // If the backend returns a 403 (Forbidden) or 401 (Unauthorized) error, it's a permission issue
-    if (err.status === 403 || err.status === 401) {
-      this.snackBar.open("You do not have permission to edit this post", 'Close', { duration: 3000 });
-    } else {
-      
-      this.snackBar.open("Error while modifying the post", 'Close', { duration: 3000 });
-    }
-    
-    // Optional: you can choose to keep isEditing at true to let the user correct their input
-    // post.isEditing = false; 
-  }
-});
+  // 3. On force manuellement la vérification des changements
+  this.cdr.detectChanges();
+  
+  console.log('New comment added locally. New count:', this.post.comments.length);
 }
+
+  updatePost(post: any, newContent: string) {
+    const content = newContent.trim();
+    const authorId = post.author?.id || this.currentUserId;
+
+    if (!content) {
+      this.snackBar.open('Content cannot be empty', 'Close', { duration: 2000 });
+      return;
+    }
+
+    this.postService.updatePost(post.id, content, authorId).subscribe({
+      next: () => {
+        // Mise à jour locale du contenu
+        this.post.content = content; 
+        this.post.isEditing = false;
+        this.cdr.detectChanges();
+        this.snackBar.open('Post updated successfully', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        console.error('Error during update', err);
+        if (err.status === 403 || err.status === 401) {
+          this.snackBar.open("You do not have permission to edit this post", 'Close', { duration: 3000 });
+        } else {
+          this.snackBar.open("Error while modifying the post", 'Close', { duration: 3000 });
+        }
+      }
+    });
+  }
 
   onDeletePost(post: any): void {
     const postId = post.id;
-    const authorId = post.author?.id || this.currentUserId;
+    if (!confirm('Do you want to delete this post?')) return;
 
-    if (confirm('Voulez-vous supprimer ce post ?')) {
-      if (this.isAdmin && post.author?.id !== this.currentUserId) {
-        this.adminService.deletePost(postId).subscribe({
-          next: () => {
-            this.postDeleted.emit(postId);
-            this.snackBar.open('Post deleted successfully', 'Close', { duration: 2000 });
-          },
-          error: (err) => {
-            console.error('Error deleting post as admin', err);
-            this.snackBar.open('Error deleting post', 'Close', { duration: 3000 });
-          }
-        });
-        return;
-      }
-
-      if (!authorId) return;
-
-      this.postService.deletePost(postId, authorId).subscribe({
+    // Logique Admin
+    if (this.isAdmin && post.author?.id !== this.currentUserId) {
+      this.adminService.deletePost(postId).subscribe({
         next: () => {
           this.postDeleted.emit(postId);
           this.snackBar.open('Post deleted successfully', 'Close', { duration: 2000 });
         },
         error: (err) => {
-          console.error('Error deleting post', err);
-          this.snackBar.open('You are not allowed to delete this post', 'Close', { duration: 3000 });
+          console.error('Admin delete error', err);
+          this.snackBar.open('Error deleting post', 'Close', { duration: 3000 });
+        }
+      });
+      return;
+    }
+
+    // Logique Auteur
+    const authorId = post.author?.id || this.currentUserId;
+    if (!authorId) return;
+
+    this.postService.deletePost(postId, authorId).subscribe({
+      next: () => {
+        this.postDeleted.emit(postId);
+        this.snackBar.open('Post deleted successfully', 'Close', { duration: 2000 });
+      },
+      error: (err) => {
+        this.snackBar.open('You are not allowed to delete this post', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  openReportDialog(author: any): void {
+    const reason = prompt(`Reason for reporting ${author.username}:`);
+    if (reason && reason.trim()) {
+      const report = {
+        reportedProfileId: author.id,
+        reporterId: this.currentUserId,
+        reason: reason,
+        timestamp: new Date()
+      };
+
+      this.reportService.sendReport(report).subscribe({
+        next: () => {
+          this.snackBar.open('Report sent to administrators', 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          console.error('Failed to send report', err);
+          this.snackBar.open('Error sending report', 'Close', { duration: 3000 });
         }
       });
     }
   }
-
-  /****************************************************Report**********************************************************/
-
- openReportDialog(author: any): void {
-  const reason = prompt(`Reason for reporting ${author.username}:`);
-  
-  if (reason && reason.trim()) {
-    const report = {
-      reportedProfileId: author.id,
-      reporterId: this.currentUserId, // Assure-toi d'avoir récupéré l'ID de l'utilisateur courant
-      reason: reason,
-      timestamp: new Date()
-    };
-
-    this.reportService.sendReport(report).subscribe({
-      next: () => {
-        // Maintenant, cette ligne fonctionnera parfaitement !
-        this.snackBar.open('Report sent to administrators', 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        console.error('Failed to send report', err);
-        this.snackBar.open('Error sending report', 'Close', { duration: 3000 });
-      }
-    });
-  }
-}
 }

@@ -48,4 +48,19 @@ public class CustomUserDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
+
+    @Override
+    public boolean isEnabled() {
+        return true; // Compte actif
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true; // Le compte n'expire jamais
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true; // Le mot de passe n'expire jamais
+    }
 }

@@ -7,6 +7,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService } from '../../services/auth.service';
 import { CommentService } from '../../services/comment';
+import {  Output, EventEmitter } from '@angular/core'; // Ajoutez Output et EventEmitter
 
 @Component({
   selector: 'app-post-comments',
@@ -24,7 +25,7 @@ import { CommentService } from '../../services/comment';
 })
 export class PostCommentsComponent implements OnInit {
   @Input() postId!: number;
-  
+  @Output() commentAdded = new EventEmitter<any>();
   // On utilise un setter pour transformer l'input en Signal dès qu'il arrive
   @Input() set comments(value: any[]) {
     this.commentsSignal.set(value || []);
@@ -58,7 +59,8 @@ export class PostCommentsComponent implements OnInit {
       
       next: (newComment) => {
         // Mise à jour réactive : on ajoute le nouveau commentaire à la liste
-        this.commentsSignal.update(list => [...list, newComment]);
+      this.commentsSignal.update(list => [...list, newComment]);
+      this.commentAdded.emit(newComment);
         input.value = ''; // On vide le champ de saisie
       },
       error: (err) => {

@@ -50,33 +50,25 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    
+  @Bean
 public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
-        // 1. ACTIVER le CORS (ne pas le désactiver !)
         .cors(Customizer.withDefaults())
-        .csrf(csrf -> csrf.disable()) 
         .exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler))
         .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers("/api/admin/**").hasRole("ADMIN")
-            // 2. Autoriser explicitement les requêtes OPTIONS (Preflight)
+            // Autoriser le preflight CORS
             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers(
-    "/api/signin",
-    "/api/signup",
-    "/*.jpeg",
-    "/*.jpg",
-    "/*.png",
-    "/*.mp4",
-    "/*.avi",
-    "/*.mov",
-    "/*.webm",
-    "/*.mkv"
-).permitAll()
+            // Routes publiques de l'API
+            .requestMatchers("/api/signin", "/api/signup").permitAll()
+            // Autoriser l'accès aux fichiers statiques et aux médias
+            .requestMatchers("/", "/index.html", "/static/**", "/*.jpeg", "/*.jpg", "/*.png", "/*.mp4").permitAll()
+            // CRUCIAL : Autoriser la route d'erreur pour que SpaErrorController puisse répondre
+            .requestMatchers("/error").permitAll()
+            // Administration
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            // Tout le reste demande d'être loggé
             .anyRequest().authenticated());
 
     http.addFilterBefore(

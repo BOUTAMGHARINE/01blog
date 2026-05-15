@@ -50,3 +50,8 @@ html, body { height: 100%; margin: 0; font-family: Roboto, "Helvetica Neue", san
 .password-row mat-form-field {
   flex: 1;
 }
+.notification-item {
+    pointer-events: none; /* Désactive tous les clics, sélections et survols */
+    user-select: none;    /* Empêche aussi de sélectionner le texte si tu le souhaites */
+    cursor: default;      /* Force le curseur classique au lieu de la main */
+}

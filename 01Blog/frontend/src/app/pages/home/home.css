@@ -354,3 +354,11 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 .user-avatar-tiny img { width: 100%; height: 100%; object-fit: cover; }
+.notif-menu-row {
+    cursor: default !important; /* Curseur normal au lieu de la main */
+    transition: none !important;
+}
+
+.notif-menu-row:hover {
+    background-color: transparent !important; /* Pas d'effet de survol */
+}

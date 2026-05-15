@@ -4,6 +4,7 @@ import { LoginComponent} from './pages/login/login';
 import { RegisterComponent } from './pages/register/register';
 import { AdminPanelComponent } from './pages/admin-panel/admin-panel';
 import { ProfileComponent } from './pages/profile/profile';
+import { NotFound } from './component/not-found/not-found';
 
 export const routes: Routes = [
     {
@@ -30,5 +31,6 @@ export const routes: Routes = [
    },
    { path: 'profile/:id', 
 component: ProfileComponent },
+{ path: '**', component: NotFound }
 
 ];
